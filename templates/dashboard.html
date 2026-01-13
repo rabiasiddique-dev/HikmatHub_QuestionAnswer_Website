@@ -1,0 +1,160 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Hikmat Hub{% endblock %}
+
+{% block content %}
+<div class="container dashboard-page">
+    <div class="dashboard-header">
+        <h1><i class="fas fa-tachometer-alt"></i> My Dashboard</h1>
+        <p>Welcome back, <strong>{{ current_user.username }}</strong>!</p>
+    </div>
+
+    <div class="dashboard-layout">
+        <!-- Sidebar Navigation -->
+        <aside class="dashboard-sidebar">
+            <nav class="dashboard-nav">
+                <a href="#activity" class="dashboard-nav-item active" data-tab="activity">
+                    <i class="fas fa-history"></i> Activity
+                </a>
+                <a href="#bookmarks" class="dashboard-nav-item" data-tab="bookmarks">
+                    <i class="fas fa-bookmark"></i> Bookmarks
+                </a>
+                <a href="#following" class="dashboard-nav-item" data-tab="following">
+                    <i class="fas fa-users"></i> Following
+                </a>
+                <a href="#stats" class="dashboard-nav-item" data-tab="stats">
+                    <i class="fas fa-chart-line"></i> Stats
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="dashboard-main">
+            <!-- Activity Tab -->
+            <div id="activity" class="dashboard-tab active">
+                <h2>Recent Activity</h2>
+                <div class="activity-timeline">
+                    {% if activities %}
+                    {% for activity in activities %}
+                    <div class="activity-item">
+                        <div class="activity-icon">
+                            <i class="fas fa-{{ activity.icon }}"></i>
+                        </div>
+                        <div class="activity-content">
+                            <p class="activity-text">{{ activity.text|safe }}</p>
+                            <span class="activity-time">{{ activity.timestamp.strftime('%b %d, %Y at %I:%M %p')
+                                }}</span>
+                        </div>
+                    </div>
+                    {% endfor %}
+                    {% else %}
+                    <div class="empty-state">
+                        <i class="fas fa-inbox fa-3x"></i>
+                        <p>No recent activity</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Bookmarks Tab -->
+            <div id="bookmarks" class="dashboard-tab">
+                <h2>Saved Questions</h2>
+                <div class="questions-list">
+                    {% if bookmarked_questions %}
+                    {% for question in bookmarked_questions %}
+                    {% include 'partials/_question_card.html' %}
+                    {% endfor %}
+                    {% else %}
+                    <div class="empty-state">
+                        <i class="fas fa-bookmark fa-3x"></i>
+                        <p>No bookmarked questions yet</p>
+                        <a href="{{ url_for('index') }}" class="btn btn-primary">Browse Questions</a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Following Tab -->
+            <div id="following" class="dashboard-tab">
+                <h2>Following</h2>
+                <div class="following-sections">
+                    <div class="following-section">
+                        <h3><i class="fas fa-tags"></i> Tags</h3>
+                        <div class="tags-list">
+                            {% if following_tags %}
+                            {% for tag in following_tags %}
+                            <a href="{{ url_for('search_results', tag=tag) }}" class="tag">{{ tag }}</a>
+                            {% endfor %}
+                            {% else %}
+                            <p class="text-muted">Not following any tags</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="following-section">
+                        <h3><i class="fas fa-users"></i> Users</h3>
+                        <div class="users-list">
+                            {% if following_users %}
+                            {% for user in following_users %}
+                            <div class="user-item">
+                                <a href="{{ url_for('view_profile', username=user.username) }}">
+                                    <strong>{{ user.username }}</strong>
+                                </a>
+                                <span class="user-rep">{{ user.reputation }} rep</span>
+                            </div>
+                            {% endfor %}
+                            {% else %}
+                            <p class="text-muted">Not following any users</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stats Tab -->
+            <div id="stats" class="dashboard-tab">
+                <h2>Your Statistics</h2>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <i class="fas fa-question-circle"></i>
+                        <div class="stat-value">{{ stats.questions_asked }}</div>
+                        <div class="stat-label">Questions Asked</div>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-reply"></i>
+                        <div class="stat-value">{{ stats.answers_posted }}</div>
+                        <div class="stat-label">Answers Posted</div>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-check-circle"></i>
+                        <div class="stat-value">{{ stats.accepted_answers }}</div>
+                        <div class="stat-label">Accepted Answers</div>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-star"></i>
+                        <div class="stat-value">{{ current_user.reputation }}</div>
+                        <div class="stat-label">Reputation</div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+<script>
+    // Tab switching
+    document.querySelectorAll('.dashboard-nav-item').forEach(item => {
+        item.addEventListener('click', function (e) {
+            e.preventDefault();
+            const tabId = this.dataset.tab;
+
+            // Update nav
+            document.querySelectorAll('.dashboard-nav-item').forEach(nav => nav.classList.remove('active'));
+            this.classList.add('active');
+
+            // Update tabs
+            document.querySelectorAll('.dashboard-tab').forEach(tab => tab.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+        });
+    });
+</script>
+{% endblock %}

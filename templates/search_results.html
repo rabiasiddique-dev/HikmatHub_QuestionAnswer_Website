@@ -1,83 +1,153 @@
 {% extends "base.html" %}
 
-{% block title %}{{ title }} - Hikmat Hub{% endblock %}
+{% block title %}Search Results - Hikmat Hub{% endblock %}
 
 {% block content %}
-<div class="container page-container">
-    <header class="page-header">
-        <h1>{{ title }}</h1>
-        <p class="text-muted">{{ total_results }} question{{ 's' if total_results != 1 else '' }} found.</p>
-    </header>
-
-    {% if questions %}
-        <section class="questions-list">
-            {% for question in questions %}
-                {% include 'partials/_question_card.html' %} {# Reusing the question card #}
-            {% endfor %}
-        </section>
-
-        {# Pagination (agar aapne banayi hai) #}
-        {% if total_pages > 1 %}
-        <nav aria-label="Page navigation" class="mt-4">
-            <ul class="pagination">
-                {# Previous Page Link #}
-                <li class="page-item {% if page == 1 %}disabled{% endif %}">
-                    <a class="page-link" href="{{ url_for('search_results', query=request.args.get('query', ''), tag=request.args.get('tag', ''), page=page-1) if page > 1 else '#' }}" aria-label="Previous">
-                        <span aria-hidden="true">«</span>
-                    </a>
-                </li>
-
-                {# Page Number Links - Simple version #}
-                {% set start_page = [1, page-2] | max %}
-                {% set end_page = [total_pages, page+2] | min %}
-
-                {% if start_page > 1 %}
-                    <li class="page-item"><a class="page-link" href="{{ url_for('search_results', query=request.args.get('query', ''), tag=request.args.get('tag', ''), page=1) }}">1</a></li>
-                    {% if start_page > 2 %}
-                        <li class="page-item disabled"><span class="page-link">...</span></li>
-                    {% endif %}
-                {% endif %}
-
-                {% for p in range(start_page, end_page + 1) %}
-                <li class="page-item {% if p == page %}active{% endif %}">
-                    <a class="page-link" href="{{ url_for('search_results', query=request.args.get('query', ''), tag=request.args.get('tag', ''), page=p) }}">{{ p }}</a>
-                </li>
-                {% endfor %}
-
-                {% if end_page < total_pages %}
-                    {% if end_page < total_pages - 1 %}
-                        <li class="page-item disabled"><span class="page-link">...</span></li>
-                    {% endif %}
-                    <li class="page-item"><a class="page-link" href="{{ url_for('search_results', query=request.args.get('query', ''), tag=request.args.get('tag', ''), page=total_pages) }}">{{ total_pages }}</a></li>
-                {% endif %}
-
-                {# Next Page Link #}
-                <li class="page-item {% if page == total_pages %}disabled{% endif %}">
-                    <a class="page-link" href="{{ url_for('search_results', query=request.args.get('query', ''), tag=request.args.get('tag', ''), page=page+1) if page < total_pages else '#' }}" aria-label="Next">
-                        <span aria-hidden="true">»</span>
-                    </a>
-                </li>
-            </ul>
-        </nav>
+<div class="container search-page">
+    <div class="search-header">
+        <h1><i class="fas fa-search"></i> Search Results</h1>
+        {% if query %}
+        <p class="search-query">Results for: <strong>"{{ query }}"</strong></p>
+        {% elif tag %}
+        <p class="search-query">Questions tagged: <span class="tag">{{ tag }}</span></p>
         {% endif %}
+        <p class="results-count">{{ total_results }} result{{ 's' if total_results != 1 else '' }} found</p>
+    </div>
 
-    {% else %}
-        <div class="empty-state">
-            <i class="fas fa-search fa-3x text-muted mb-3"></i>
-            <p>No questions found matching your criteria.</p>
-            <p>Try different keywords or browse <a href="{{ url_for('index') }}">all questions</a>.</p>
-        </div>
-    {% endif %}
+    <div class="search-layout">
+        <!-- Filters Sidebar -->
+        <aside class="search-filters">
+            <h3><i class="fas fa-filter"></i> Filters</h3>
+
+            <form method="GET" action="{{ url_for('search_results') }}" id="search-filter-form">
+                <input type="hidden" name="query" value="{{ query or '' }}">
+                <input type="hidden" name="tag" value="{{ tag or '' }}">
+
+                <!-- Tags Filter -->
+                <div class="filter-group">
+                    <label class="filter-label"><i class="fas fa-tags"></i> Tags</label>
+                    <div class="tag-filter-list">
+                        {% for ptag in popular_tags[:10] %}
+                        <label class="tag-checkbox">
+                            <input type="checkbox" name="tags" value="{{ ptag }}" {% if ptag in selected_tags
+                                %}checked{% endif %} onchange="this.form.submit()">
+                            <span class="tag">{{ ptag }}</span>
+                        </label>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Date Range Filter -->
+                <div class="filter-group">
+                    <label class="filter-label"><i class="fas fa-calendar"></i> Date Range</label>
+                    <select name="date_range" class="filter-select" onchange="this.form.submit()">
+                        <option value="">Any time</option>
+                        <option value="today" {% if date_range=='today' %}selected{% endif %}>Today</option>
+                        <option value="week" {% if date_range=='week' %}selected{% endif %}>This week</option>
+                        <option value="month" {% if date_range=='month' %}selected{% endif %}>This month</option>
+                        <option value="year" {% if date_range=='year' %}selected{% endif %}>This year</option>
+                    </select>
+                </div>
+
+                <!-- Answer Status Filter -->
+                <div class="filter-group">
+                    <label class="filter-label"><i class="fas fa-check-circle"></i> Status</label>
+                    <select name="status" class="filter-select" onchange="this.form.submit()">
+                        <option value="">All questions</option>
+                        <option value="answered" {% if status=='answered' %}selected{% endif %}>Answered</option>
+                        <option value="unanswered" {% if status=='unanswered' %}selected{% endif %}>Unanswered</option>
+                        <option value="accepted" {% if status=='accepted' %}selected{% endif %}>Has accepted answer
+                        </option>
+                    </select>
+                </div>
+
+                <!-- Votes Filter -->
+                <div class="filter-group">
+                    <label class="filter-label"><i class="fas fa-thumbs-up"></i> Min Votes</label>
+                    <input type="number" name="min_votes" class="filter-input" value="{{ min_votes or '' }}"
+                        placeholder="0" min="0">
+                </div>
+
+                <div class="filter-actions">
+                    <button type="submit" class="btn btn-primary btn-sm btn-block">Apply</button>
+                    <a href="{{ url_for('search_results', query=query, tag=tag) }}"
+                        class="btn btn-outline-primary btn-sm btn-block">Clear</a>
+                </div>
+            </form>
+        </aside>
+
+        <!-- Search Results -->
+        <main class="search-results-main">
+            <!-- Sort Options -->
+            <div class="search-sort">
+                <label><i class="fas fa-sort"></i> Sort by:</label>
+                <div class="sort-buttons">
+                    <a href="{{ url_for('search_results', query=query, tag=tag, sort='newest', **filter_params) }}"
+                        class="sort-btn {% if sort_by == 'newest' or not sort_by %}active{% endif %}">
+                        <i class="fas fa-clock"></i> Newest
+                    </a>
+                    <a href="{{ url_for('search_results', query=query, tag=tag, sort='votes', **filter_params) }}"
+                        class="sort-btn {% if sort_by == 'votes' %}active{% endif %}">
+                        <i class="fas fa-thumbs-up"></i> Most Voted
+                    </a>
+                    <a href="{{ url_for('search_results', query=query, tag=tag, sort='views', **filter_params) }}"
+                        class="sort-btn {% if sort_by == 'views' %}active{% endif %}">
+                        <i class="fas fa-eye"></i> Most Viewed
+                    </a>
+                    <a href="{{ url_for('search_results', query=query, tag=tag, sort='active', **filter_params) }}"
+                        class="sort-btn {% if sort_by == 'active' %}active{% endif %}">
+                        <i class="fas fa-fire"></i> Active
+                    </a>
+                </div>
+            </div>
+
+            <!-- Results List -->
+            <div class="questions-list">
+                {% if questions %}
+                {% for question in questions %}
+                {% include 'partials/_question_card.html' %}
+                {% endfor %}
+                {% else %}
+                <div class="empty-state">
+                    <i class="fas fa-search fa-3x"></i>
+                    <h3>No results found</h3>
+                    <p>Try adjusting your filters or search query</p>
+                    <a href="{{ url_for('index') }}" class="btn btn-primary">Browse All Questions</a>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Pagination -->
+            {% if total_pages > 1 %}
+            <nav class="pagination">
+                <ul>
+                    {% if page > 1 %}
+                    <li><a
+                            href="{{ url_for('search_results', query=query, tag=tag, page=page-1, sort=sort_by, **filter_params) }}">
+                            <i class="fas fa-chevron-left"></i> Previous
+                        </a></li>
+                    {% endif %}
+
+                    {% for p in range(1, total_pages + 1) %}
+                    {% if p == page %}
+                    <li class="active"><span>{{ p }}</span></li>
+                    {% elif p <= 3 or p> total_pages - 3 or (p >= page - 1 and p <= page + 1) %} <li><a
+                                href="{{ url_for('search_results', query=query, tag=tag, page=p, sort=sort_by, **filter_params) }}">{{
+                                p }}</a></li>
+                            {% elif p == 4 or p == total_pages - 3 %}
+                            <li><span>...</span></li>
+                            {% endif %}
+                            {% endfor %}
+
+                            {% if page < total_pages %} <li><a
+                                    href="{{ url_for('search_results', query=query, tag=tag, page=page+1, sort=sort_by, **filter_params) }}">
+                                    Next <i class="fas fa-chevron-right"></i>
+                                </a></li>
+                                {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+        </main>
+    </div>
 </div>
-{% endblock %}
-
-{% block scripts %}
-{{ super() }}
-<style>
-.page-container { margin-top: 2rem; }
-.page-header { margin-bottom: 2rem; border-bottom: 1px solid var(--border-color); padding-bottom: 1rem; }
-.page-header h1 { font-size: 2rem; }
-.empty-state .fa-search { font-size: 3rem; margin-bottom: 1rem; }
-.mt-4 { margin-top: 1.5rem !important; }
-</style>
 {% endblock %}

@@ -457,22 +457,29 @@ document.addEventListener('DOMContentLoaded', function () {
     // --- EasyMDE Initialization for Questions and Answers ---
     const textareas = document.querySelectorAll('.textarea-body');
     textareas.forEach(textarea => {
-        const easyMDE = new EasyMDE({
-            element: textarea,
-            forceSync: true,
-            spellChecker: false,
-            autosave: {
-                enabled: true,
-                uniqueId: textarea.id || "hikmat-hub-editor",
-                delay: 1000,
-            },
-            placeholder: textarea.placeholder || "Write your content here...",
-            status: ['lines', 'words', 'cursor'],
-            renderingConfig: {
-                singleLineBreaks: false,
-                codeSyntaxHighlighting: true,
-            },
-        });
+        try {
+            const easyMDE = new EasyMDE({
+                element: textarea,
+                forceSync: true,
+                spellChecker: false,
+                autosave: {
+                    enabled: true,
+                    uniqueId: textarea.id || "hikmat-hub-editor",
+                    delay: 1000,
+                },
+                placeholder: textarea.placeholder || "Write your content here...",
+                status: ['lines', 'words', 'cursor'],
+                renderingConfig: {
+                    singleLineBreaks: false,
+                    codeSyntaxHighlighting: true,
+                },
+            });
+        } catch (error) {
+            console.error('EasyMDE initialization failed:', error);
+            // Fallback: ensure textarea is visible if EasyMDE fails
+            textarea.style.display = 'block';
+            textarea.style.visibility = 'visible';
+        }
     });
 
 }); // End of main DOMContentLoaded listener
