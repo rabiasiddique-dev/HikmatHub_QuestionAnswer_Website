@@ -94,8 +94,21 @@
                 (Rep: {{ answer.author_reputation }})
                 answered on {{ answer.timestamp.strftime('%B %d, %Y, %I:%M %p') }}
             </div>
-            <div class="answer-body">
+            <div class="answer-body" id="answer-body-{{ answer._id }}">
+                <div class="summary-container mb-3" id="summary-container-{{ answer._id }}" style="display: none;">
+                    <div class="alert alert-info">
+                        <strong><i class="fas fa-magic"></i> TL;DR:</strong>
+                        <span class="summary-text" id="summary-text-{{ answer._id }}"></span>
+                    </div>
+                </div>
                 {{ answer.body|markdown }}
+
+                {% if answer.body|length > 600 %}
+                <button class="btn btn-sm btn-outline-info mt-2 generate-summary-btn" data-answer-id="{{ answer._id }}"
+                    data-text="{{ answer.body|e }}">
+                    <i class="fas fa-magic"></i> Show TL;DR (AI Summary)
+                </button>
+                {% endif %}
             </div>
             <div class="actions-toolbar"> {# Toolbar for voting and marking best answer #}
                 <div class="voting-section" data-id="{{ answer._id|string }}" data-type="answer">

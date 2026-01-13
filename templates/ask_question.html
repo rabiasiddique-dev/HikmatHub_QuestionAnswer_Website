@@ -1,33 +1,81 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="form-container">
-    <h2>Ask a New Question</h2>
-    <form method="POST" action="">
-        {{ form.hidden_tag() }} <!-- CSRF token -->
-        <div class="form-group">
-            {{ form.title.label(class="form-label") }}
-            {{ form.title(class="form-control", placeholder="e.g., How does photosynthesis work?") }}
-            {% if form.title.errors %}
-                {% for error in form.title.errors %}<span class="form-error">{{ error }}</span>{% endfor %}
-            {% endif %}
+<div class="row">
+    <div class="col-md-8">
+        <div class="form-container">
+            <h2>Ask a New Question</h2>
+            <form method="POST" action="">
+                {{ form.hidden_tag() }} <!-- CSRF token -->
+                <div class="form-group">
+                    {{ form.title.label(class="form-label") }}
+                    {{ form.title(class="form-control", placeholder="e.g., How does photosynthesis work?",
+                    autocomplete="off") }}
+                    {% if form.title.errors %}
+                    {% for error in form.title.errors %}<span class="form-error">{{ error }}</span>{% endfor %}
+                    {% endif %}
+                </div>
+                <div class="form-group">
+                    {{ form.body.label(class="form-label") }}
+                    {{ form.body(class="form-control textarea-body", rows="8", placeholder="Provide all the details
+                    about your question...") }}
+                    {% if form.body.errors %}
+                    {% for error in form.body.errors %}<span class="form-error">{{ error }}</span>{% endfor %}
+                    {% endif %}
+                </div>
+                <div class="form-group">
+                    {{ form.tags.label(class="form-label") }}
+                    {{ form.tags(class="form-control", placeholder="e.g., science, biology, plants", autocomplete="off")
+                    }}
+                    <div id="suggested-tags-container" style="display: none; margin-top: 10px;">
+                        <small class="text-muted"><i class="fas fa-magic"></i> Suggested Tags:</small>
+                        <div id="suggested-tags-list" class="d-flex flex-wrap gap-2 mt-1"></div>
+                    </div>
+                    {% if form.tags.errors %}
+                    {% for error in form.tags.errors %}<span class="form-error">{{ error }}</span>{% endfor %}
+                    {% endif %}
+                </div>
+                <div class="form-group">
+                    {{ form.submit(class="btn btn-primary") }}
+                </div>
+            </form>
         </div>
-        <div class="form-group">
-            {{ form.body.label(class="form-label") }}
-            {{ form.body(class="form-control textarea-body", rows="8", placeholder="Provide all the details about your question...") }}
-            {% if form.body.errors %}
-                {% for error in form.body.errors %}<span class="form-error">{{ error }}</span>{% endfor %}
-            {% endif %}
+    </div>
+
+    <!-- Sidebar for AI Suggestions -->
+    <div class="col-md-4">
+        <div id="similar-questions-container" class="sticky-top" style="top: 20px; display: none;">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-warning text-dark border-0">
+                    <h5 class="mb-0" style="font-size: 1rem;"><i class="fas fa-exclamation-circle"></i> Similar
+                        Questions</h5>
+                </div>
+                <div class="card-body">
+                    <p class="small text-muted mb-3">Before you post, check if your question has already been asked:</p>
+                    <div id="similar-questions-list" class="list-group list-group-flush">
+                        <!-- Similar questions will be injected here -->
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="form-group">
-            {{ form.tags.label(class="form-label") }}
-            {{ form.tags(class="form-control", placeholder="e.g., science, biology, plants") }}
-            {% if form.tags.errors %}
-                {% for error in form.tags.errors %}<span class="form-error">{{ error }}</span>{% endfor %}
-            {% endif %}
+
+        <!-- Quality Analysis Container -->
+        <div id="quality-analysis-container" class="sticky-top mt-3" style="top: 350px; display: none;">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-info text-white border-0">
+                    <h5 class="mb-0" style="font-size: 1rem;"><i class="fas fa-microscope"></i> Content Quality</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span>Score:</span>
+                        <span id="quality-score-value" class="font-weight-bold">0/100</span>
+                    </div>
+                    <div class="progress mb-3" style="height: 10px;">
+                        <div id="quality-score-bar" class="progress-bar" role="progressbar" style="width: 0%"></div>
+                    </div>
+                    <div id="quality-feedback-list"></div>
+                </div>
+            </div>
         </div>
-        <div class="form-group">
-            {{ form.submit(class="btn btn-primary") }}
-        </div>
-    </form>
+    </div>
 </div>
 {% endblock %}

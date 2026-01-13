@@ -1,0 +1,21 @@
+/* AI Feature Styles */
+.suggestion-tag {
+    transition: all 0.2s ease;
+    font-size: 0.9rem;
+    padding: 0.35em 0.65em;
+}
+
+.suggestion-tag:hover {
+    background-color: var(--primary-color) !important;
+    color: white !important;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.cursor-pointer {
+    cursor: pointer;
+}
+
+.gap-2 {
+    gap: 0.5rem;
+}
