@@ -9,32 +9,44 @@ import nltk
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
 
-# Configure NLTK to use /tmp directory for Vercel
-nltk_data_path = os.path.join('/tmp', 'nltk_data')
-if not os.path.exists(nltk_data_path):
-    os.makedirs(nltk_data_path, exist_ok=True)
+def ensure_nltk():
+    """Ensure NLTK data is downloaded (Lazy Init)"""
+    # Configure NLTK to use /tmp directory for Vercel
+    nltk_data_path = os.path.join('/tmp', 'nltk_data')
+    if not os.path.exists(nltk_data_path):
+        os.makedirs(nltk_data_path, exist_ok=True)
 
-nltk.data.path.append(nltk_data_path)
+    if nltk_data_path not in nltk.data.path:
+        nltk.data.path.append(nltk_data_path)
 
-try:
-    nltk.data.find('tokenizers/punkt')
-except LookupError:
-    nltk.download('punkt', download_dir=nltk_data_path)
-    
-try:
-    nltk.data.find('corpora/stopwords')
-except LookupError:
-    nltk.download('stopwords', download_dir=nltk_data_path)
+    try:
+        nltk.data.find('tokenizers/punkt')
+    except LookupError:
+        try:
+            nltk.download('punkt', download_dir=nltk_data_path)
+        except: pass # Fallback or already downloading
+        
+    try:
+        nltk.data.find('corpora/stopwords')
+    except LookupError:
+        try:
+            nltk.download('stopwords', download_dir=nltk_data_path)
+        except: pass
 
 
 def preprocess_text(text):
     """Clean and preprocess text for NLP"""
-    text = text.lower()
-    text = re.sub(r'[^a-zA-Z\s]', '', text)
-    tokens = word_tokenize(text)
-    stop_words = set(stopwords.words('english'))
-    tokens = [word for word in tokens if word not in stop_words and len(word) > 2]
-    return tokens # Return list of tokens
+    ensure_nltk() # Call init here
+    try:
+        text = text.lower()
+        text = re.sub(r'[^a-zA-Z\s]', '', text)
+        tokens = word_tokenize(text)
+        stop_words = set(stopwords.words('english'))
+        tokens = [word for word in tokens if word not in stop_words and len(word) > 2]
+        return tokens
+    except Exception as e:
+        # Fallback if NLTK fails completely (e.g. download failed)
+        return text.lower().split()
 
 # --- Simple TF-IDF Implementation (Pure Python) ---
 
