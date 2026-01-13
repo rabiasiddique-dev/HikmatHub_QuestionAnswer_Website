@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block title %}Request Password Reset - Hikmat Hub{% endblock %}
+
+{% block content %}
+<div class="form-container auth-form password-reset-request-form">
+    <div class="text-center mb-4">
+        <i class="fas fa-key fa-3x text-primary"></i> {# Icon #}
+    </div>
+    <h2>Forgot Your Password?</h2>
+    <p class="text-muted">
+        No worries! Enter your email address below, and if an account exists,
+        we'll send you a link to reset your password.
+    </p>
+    <form method="POST" action="{{ url_for('request_password_reset') }}">
+        {{ form.hidden_tag() }}
+        <div class="form-group">
+            {{ form.email.label(class="form-label sr-only", for="email") }} {# sr-only if placeholder is enough #}
+            {{ form.email(class="form-control form-control-lg", placeholder="Enter your email address", id="email") }}
+            {% if form.email.errors %}
+                <div class="invalid-feedback d-block">
+                    {% for error in form.email.errors %}<span>{{ error }}</span>{% endfor %}
+                </div>
+            {% endif %}
+        </div>
+        <div class="form-group mt-4">
+            {{ form.submit(class="btn btn-primary btn-lg btn-block") }}
+        </div>
+    </form>
+    <div class="text-center mt-3">
+        <a href="{{ url_for('login') }}" class="small"><i class="fas fa-arrow-left mr-1"></i> Back to Login</a>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<style>
+.password-reset-request-form {
+    max-width: 500px; /* Slightly wider for more text */
+}
+.password-reset-request-form .fa-key {
+    margin-bottom: 1rem;
+}
+.form-control-lg { /* If using Bootstrap-like sizing */
+    padding: 0.8rem 1.2rem;
+    font-size: 1.1rem;
+}
+.invalid-feedback.d-block .form-error { /* Ensure errors are visible */
+    display: block;
+}
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0,0,0,0);
+    white-space: nowrap;
+    border: 0;
+}
+</style>
+{% endblock %}

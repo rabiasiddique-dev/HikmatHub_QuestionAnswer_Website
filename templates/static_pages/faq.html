@@ -1,0 +1,71 @@
+{% extends "base.html" %} {# Assuming your base.html is in templates/ folder #}
+
+{% block title %}Help & FAQ - Hikmat Hub{% endblock %}
+
+{% block content %}
+<div class="container page-container static-page-content mt-3">
+    <header class="page-header">
+        <h1><i class="fas fa-question-circle text-info mr-2"></i>Frequently Asked Questions (FAQ)</h1>
+        <p class="text-muted">Find answers to common questions about Hikmat Hub.</p>
+    </header>
+
+    <section class="faq-section">
+        <div class="faq-item">
+            <h4>What is Hikmat Hub?</h4>
+            <p>Hikmat Hub is a community-driven platform where users can ask questions, share knowledge, and provide insightful answers on a wide range of topics. Our goal is to foster a collaborative learning environment.</p>
+        </div>
+
+        <div class="faq-item">
+            <h4>How do I ask a question?</h4>
+            <p>To ask a question, simply click on the "Ask Question" button (usually in the navbar or on the homepage). Make sure your question is clear, concise, and provides enough context. Use relevant tags to help others find and answer your question.</p>
+        </div>
+
+        <div class="faq-item">
+            <h4>How do I write a good answer?</h4>
+            <p>Good answers are helpful, accurate, and well-explained. If possible, provide sources or examples to support your answer. Be respectful and constructive, even when disagreeing with other answers or the question itself.</p>
+        </div>
+
+        <div class="faq-item">
+            <h4>What are tags and how do I use them?</h4>
+            <p>Tags are keywords or labels that categorize questions. When asking a question, add relevant tags (e.g., "python", "history", "cooking") to make it easier for users interested in those topics to find your question. You can usually add multiple tags, separated by commas.</p>
+        </div>
+        
+        <div class="faq-item">
+            <h4>How does the reputation system work?</h4>
+            <p>You earn reputation points based on your activity and the quality of your contributions. For example, you gain points when your questions or answers are upvoted, or when your answer is marked as the "Best Answer". Reputation points reflect your standing and trustworthiness within the community.</p>
+        </div>
+
+        <div class="faq-item">
+            <h4>What are badges?</h4>
+            <p>Badges are special achievements awarded to users for specific contributions or milestones, such as asking your first question, receiving a certain number of upvotes, or maintaining a high reputation. They are a fun way to recognize your participation.</p>
+        </div>
+
+        <div class="faq-item">
+            <h4>Can I edit my questions or answers?</h4>
+            <p>Yes, you can edit your own questions and answers. If you made a mistake, want to add more information, or clarify something, look for an "Edit" option on your post.</p>
+        </div>
+
+        <div class="faq-item">
+            <h4>What if I see inappropriate content?</h4>
+            <p>If you encounter any content (questions, answers, or comments) that violates our Community Guidelines, please use the reporting feature (if available) or contact the site moderators. Your help is crucial in maintaining a positive environment.</p>
+        </div>
+        
+        <div class="faq-item">
+            <h4>How do I reset my password?</h4>
+            <p>If you've forgotten your password, you can click on the "Forgot Password?" link on the login page. You'll be asked to enter your email address, and if an account exists, a password reset link will be sent to you.</p>
+        </div>
+
+        <div class="faq-item">
+            <h4>How can I contact support?</h4>
+            <p>If you have any other questions or need assistance, you can use the "Get in Touch" form in the footer of our website, or email us directly at [Your Support Email Address - e.g., support@hikmathub.com].</p>
+        </div>
+        {# Add more FAQ items as needed #}
+    </section>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+{# No specific JavaScript needed for a static FAQ page unless you add interactive elements #}
+{# The styles for .static-page-content, .faq-section, etc., should be in your main style.css #}
+{% endblock %}

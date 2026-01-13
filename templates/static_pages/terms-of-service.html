@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block title %}{{ title }} - Hikmat Hub{% endblock %}
+
+{% block content %}
+<div class="container page-container static-page-content mt-3">
+    <header class="page-header">
+        <h1><i class="fas fa-file-contract text-primary mr-2"></i>{{ title }}</h1>
+        <p class="text-muted">Please read these terms carefully before using our service.</p>
+    </header>
+
+    <section>
+        <p><em>Last Updated: {{ now.strftime('%B %d, %Y') }}</em></p>
+
+        <h2>1. Acceptance of Terms</h2>
+        <p>By accessing or using Hikmat Hub (the "Service"), you agree to be bound by these Terms of Service ("Terms"). If you disagree with any part of the terms, then you may not access the Service.</p>
+
+        <h2>2. Use of the Service</h2>
+        <p>You agree to use the Service only for lawful purposes and in accordance with these Terms and our Community Guidelines. You are responsible for all content you post and your activity on the Service.</p>
+        <p>You must not use the Service to:
+            <ul>
+                <li>Post any content that is illegal, harmful, threatening, abusive, harassing, defamatory, vulgar, obscene, or otherwise objectionable.</li>
+                <li>Impersonate any person or entity, or falsely state or otherwise misrepresent your affiliation with a person or entity.</li>
+                <li>Upload, post, email, transmit, or otherwise make available any material that contains software viruses or any other computer code, files, or programs designed to interrupt, destroy, or limit the functionality of any computer software or hardware or telecommunications equipment.</li>
+            </ul>
+        </p>
+
+        <h2>3. User Accounts</h2>
+        <p>To access certain features of the Service, you may be required to create an account. You are responsible for safeguarding your account password and for any activities or actions under your password. You agree to notify us immediately of any unauthorized use of your account.</p>
+
+        <h2>4. Content Ownership and Intellectual Property</h2>
+        <p>You retain ownership of any intellectual property rights that you hold in the content you post to the Service. By posting content, you grant Hikmat Hub a worldwide, non-exclusive, royalty-free license to use, reproduce, adapt, publish, translate, and distribute such content in any existing or future media.</p>
+        <p>Content provided by Hikmat Hub, including text, graphics, logos, and software, is the property of Hikmat Hub or its content suppliers and protected by copyright and other intellectual property laws.</p>
+
+        <h2>5. Termination</h2>
+        <p>We may terminate or suspend your access to the Service immediately, without prior notice or liability, for any reason whatsoever, including without limitation if you breach the Terms.</p>
+
+        <h2>6. Disclaimer of Warranties</h2>
+        <p>The Service is provided on an "AS IS" and "AS AVAILABLE" basis. Hikmat Hub makes no warranties, expressed or implied, and hereby disclaims and negates all other warranties including, without limitation, implied warranties or conditions of merchantability, fitness for a particular purpose, or non-infringement of intellectual property or other violation of rights.</p>
+
+        <h2>7. Limitation of Liability</h2>
+        <p>In no event shall Hikmat Hub or its suppliers be liable for any damages (including, without limitation, damages for loss of data or profit, or due to business interruption) arising out of the use or inability to use the materials on Hikmat Hub's website, even if Hikmat Hub or a Hikmat Hub authorized representative has been notified orally or in writing of the possibility of such damage.</p>
+
+        <h2>8. Changes to Terms</h2>
+        <p>We reserve the right, at our sole discretion, to modify or replace these Terms at any time. If a revision is material, we will try to provide at least 30 days' notice prior to any new terms taking effect. What constitutes a material change will be determined at our sole discretion.</p>
+
+        <h2>9. Governing Law</h2>
+        <p>These Terms shall be governed and construed in accordance with the laws of [Your Jurisdiction/Country], without regard to its conflict of law provisions.</p>
+
+        <h2>10. Contact Us</h2>
+        <p>If you have any questions about these Terms, please contact us via the "Get in Touch" form in the footer or at [your_support_email@example.com].</p>
+    </section>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<style>
+    .static-page-content h2 { font-size: 1.5rem; margin-top: 2rem; margin-bottom: 0.75rem; color: var(--primary-color); padding-bottom: 0.25rem; border-bottom: 1px solid var(--primary-color-light); }
+    .static-page-content ul { margin-left: 1.5rem; margin-bottom: 1rem; }
+</style>
+{% endblock %}

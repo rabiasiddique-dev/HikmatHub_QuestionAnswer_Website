@@ -1,0 +1,86 @@
+{% extends "base.html" %} {# Assuming you have a base.html in your main templates folder #}
+
+{% block title %}Page Not Found - Hikmat Hub{% endblock %}
+
+{% block content %}
+<div class="error-page-container text-center">
+    <div class="error-icon">
+        <i class="fas fa-exclamation-triangle fa-5x text-warning"></i> {# FontAwesome Icon #}
+    </div>
+    <h1 class="error-code display-1 font-weight-bold mt-4">404</h1>
+    <h2 class="error-message h3">Oops! Page Not Found.</h2>
+    <p class="error-description lead text-muted mb-4">
+        The page you are looking for might have been removed, had its name changed,
+        or is temporarily unavailable.
+    </p>
+    <p class="error-suggestion">
+        Please check the URL for any typos, or try navigating from our homepage.
+    </p>
+    <div class="mt-5">
+        <a href="{{ url_for('index') }}" class="btn btn-primary btn-lg">
+            <i class="fas fa-home mr-2"></i> Go to Homepage
+        </a>
+        <a href="javascript:history.back()" class="btn btn-outline-secondary btn-lg ml-2">
+            <i class="fas fa-arrow-left mr-2"></i> Go Back
+        </a>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }} {# Include scripts from base.html if any #}
+<style>
+/* You can add specific styles here or in your main style.css */
+.error-page-container {
+    padding: 50px 20px;
+    margin: 30px auto;
+    max-width: 700px;
+    background-color: #fff; /* Or var(--card-bg) if defined */
+    border-radius: 8px; /* Or var(--border-radius) */
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08); /* Or var(--shadow) */
+}
+.error-icon .fa-exclamation-triangle {
+    color: #ffc107; /* Bootstrap warning color */
+}
+.error-code {
+    color: #dc3545; /* Bootstrap danger color or your primary color */
+    font-family: 'Poppins', sans-serif; /* Or var(--font-primary) */
+}
+.error-message {
+    color: #343a40; /* Dark grey */
+    font-weight: 600;
+}
+.lead {
+    font-size: 1.15rem;
+    font-weight: 300;
+}
+.text-muted {
+    color: #6c757d !important;
+}
+.btn-lg {
+    padding: 0.75rem 1.5rem;
+    font-size: 1.1rem;
+}
+.mr-2 {
+    margin-right: 0.5rem !important;
+}
+.ml-2 {
+    margin-left: 0.5rem !important;
+}
+.text-center {
+    text-align: center !important;
+}
+.font-weight-bold {
+    font-weight: 700 !important;
+}
+.display-1 {
+    font-size: 6rem; /* Adjust as needed */
+    font-weight: 300;
+    line-height: 1.2;
+}
+.mt-4 { margin-top: 1.5rem !important; }
+.mt-5 { margin-top: 3rem !important; }
+.mb-4 { margin-bottom: 1.5rem !important; }
+
+</style>
+{% endblock %}

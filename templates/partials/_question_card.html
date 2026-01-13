@@ -1,0 +1,31 @@
+<!-- templates/partials/_question_card.html -->
+<article class="question-card">
+    <div class="question-card-votes">
+        <button class="vote-btn upvote-question" data-id="{{ question._id }}" data-type="upvote" title="Upvote">
+            <i class="fas fa-arrow-up"></i>
+        </button>
+        <span class="vote-count" id="q-votes-{{ question._id }}">
+            {{ question.net_votes }} {# Pehle yahan (question.upvotes|length) - (question.downvotes|length) tha, ab net_votes use karein #}
+        </span>
+        <button class="vote-btn downvote-question" data-id="{{ question._id }}" data-type="downvote" title="Downvote">
+            <i class="fas fa-arrow-down"></i>
+        </button>
+    </div>
+    <div class="question-card-main">
+        {# <h3 class="question-title"><a href="{{ url_for('view_question', question_id=question._id) }}">{{ question.title }}</a></h3> <-- PURANA #}
+        <h3 class="question-title"><a href="{{ url_for('view_question', question_id_str=question._id|string) }}">{{ question.title }}</a></h3> {# <-- NAYA #}
+        <div class="question-meta">
+            <span>Asked by <a href="{{ url_for('profile', username=question.author_username) }}">{{ question.author_username }}</a></span>
+            <span>{{ question.timestamp.strftime('%b %d, %Y at %H:%M') }}</span>
+            <span>{{ question.views }} views</span>
+            <span>{{ question.answers_count }} answers</span>
+        </div>
+        <div class="question-tags">
+            {% for tag in question.tags %}
+          {#  <span class="tag">{{ tag }}</span>  #}
+                <a href="{{ url_for('search_results', tag=tag) }}" class="tag">{{ tag }}</a> {# NAYA #}
+
+            {% endfor %}
+        </div>
+    </div>
+</article>

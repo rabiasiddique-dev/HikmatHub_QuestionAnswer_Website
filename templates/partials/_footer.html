@@ -1,0 +1,86 @@
+<footer class="site-footer">
+    <div class="container footer-container">
+        <div class="footer-column about-us">
+            <h4>Hikmat Hub</h4>
+            <p>Your central place for wisdom, insights, and collaborative learning. Ask, answer, and grow with our
+                community.</p>
+            <div class="social-links">
+                {# In links ko apne actual social media page URLs se replace karein #}
+                <a href="https://facebook.com" title="Facebook" target="_blank" rel="noopener noreferrer"><i
+                        class="fab fa-facebook-f"></i></a>
+                <a href="https://twitter.com" title="Twitter" target="_blank" rel="noopener noreferrer"><i
+                        class="fab fa-twitter"></i></a>
+                <a href="https://linkedin.com" title="LinkedIn" target="_blank" rel="noopener noreferrer"><i
+                        class="fab fa-linkedin-in"></i></a>
+                <a href="https://github.com" title="GitHub" target="_blank" rel="noopener noreferrer"><i
+                        class="fab fa-github"></i></a>
+            </div>
+        </div>
+
+        <div class="footer-column quick-links">
+            <h4>Quick Links</h4>
+            <ul>
+                <li><a href="{{ url_for('index') }}">Home</a></li>
+                <li><a href="{{ url_for('ask_question') }}">Ask a Question</a></li>
+                {# Placeholder - Inke liye aapko alag routes ya logic banani hogi #}
+                {# Example: Trending questions could be a search sorted by votes #}
+                <li><a href="{{ url_for('search_results', query='is:trending') }}">Trending Questions</a></li>
+                {# Example: Popular tags could link to a page listing tags, or a search #}
+                <li><a href="{{ url_for('index') }}#tags-section">Popular Tags</a> {# Agar homepage par tags section hai
+                    #}
+            </ul>
+        </div>
+
+        <div class="footer-column legal-links">
+            <h4>Resources</h4>
+            <ul>
+                {# Placeholder - Inke liye aapko static pages aur unke routes banane honge #}
+                {# Example for static page route (if implemented): url_for('static_page', page_name='guidelines') #}
+                <li><a href="{{ url_for('static_page', page_name='faq') }}">Help / FAQ</a></li>
+                <li><a href="{{ url_for('static_page', page_name='community-guidelines')}}">Community Guidelines</a>
+                </li>
+                <li><a href="{{ url_for('static_page', page_name='terms-of-service')}}">Terms of Service</a></li>
+                <li><a href="{{ url_for('static_page', page_name='privacy-policy')}}">Privacy Policy</a></li>
+                <li><a href="{{ url_for('static_page', page_name='about-us')}}">About Us</a></li>
+            </ul>
+        </div>
+
+        <div class="footer-column contact-form">
+            <h4>Get in Touch</h4>
+            <p>Have feedback or a question for us? Let us know!</p>
+            <form id="footer-contact-form" action="{{ url_for('submit_feedback') }}" method="POST">
+                {# Assuming footer_form is available in context from app.py for WTForms #}
+                {% if footer_form %}
+                {{ footer_form.hidden_tag() }}
+                <div class="form-group-footer">
+                    {{ footer_form.email(class="form-control-footer", placeholder="Your Email", required=True,
+                    autocomplete="email") }}
+                </div>
+                <div class="form-group-footer">
+                    {{ footer_form.message(class="form-control-footer textarea-footer", placeholder="Your Message",
+                    rows="3", required=True) }}
+                </div>
+                {% else %}
+                {# Fallback to simple HTML if footer_form is not available #}
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() if csrf_token else '' }}"> {# Basic CSRF
+                for non-WTF #}
+                <div class="form-group-footer">
+                    <input type="email" name="email" class="form-control-footer" placeholder="Your Email" required
+                        autocomplete="email">
+                </div>
+                <div class="form-group-footer">
+                    <textarea name="message" class="form-control-footer textarea-footer" placeholder="Your Message"
+                        rows="3" required></textarea>
+                </div>
+                {% endif %}
+                <button type="submit" class="btn btn-secondary btn-block-footer">Send Message</button> {# Changed to
+                btn-secondary for accent #}
+            </form>
+            <div id="footer-form-status" class="form-status-message"></div>
+        </div>
+    </div>
+    <div class="footer-bottom">
+        <p>© {{ now.year if now else "" }} Hikmat Hub. All rights reserved. Crafted with <i
+                class="fas fa-heart text-danger"></i> by Rabia Siddique.</p>
+    </div>
+</footer>

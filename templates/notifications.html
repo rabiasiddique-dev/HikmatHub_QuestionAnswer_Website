@@ -1,0 +1,224 @@
+{% extends "base.html" %}
+{% block title %}{{ title }} - Hikmat Hub{% endblock %}
+
+{% block content %}
+<div class="container page-container mt-3">
+    <header class="page-header d-flex justify-content-between align-items-center">
+        <h1><i class="fas fa-bell mr-2 text-primary"></i>{{ title }}</h1>
+        {% if notifications and current_user.is_authenticated and unread_notifications_count > 0 %}
+            <button class="btn btn-sm btn-outline-secondary" id="mark-all-read-btn"
+                    data-mark-all-url="{{ url_for('mark_all_notifications_as_read') }}"> {# data attribute for JS #}
+                <i class="fas fa-check-double mr-1"></i> Mark all as read
+            </button>
+        {% endif %}
+    </header>
+
+    {% if notifications %}
+        <ul class="list-group notification-list">
+            {% for notif in notifications %}
+            {# Determine the correct link for the notification item #}
+            {% set notification_link_url = notif.target_link if notif.target_link and notif.target_link != '#' else '#' %}
+            
+            <li class="list-group-item notification-item {% if not notif.is_read %}notification-unread{% endif %}"
+                data-notification-id="{{ notif._id|string }}">
+                <a href="{{ notification_link_url }}" class="notification-link">
+                    <div class="notification-content d-flex w-100">
+                        <div class="notification-icon mr-3 align-self-center"> {# align-self-center for better vertical alignment #}
+                            {% if notif.action_type == 'new_comment_on_question' or notif.action_type == 'new_comment_on_answer' %}
+                                <i class="fas fa-comment-dots fa-lg text-info"></i>
+                            {% elif notif.action_type == 'new_answer' %}
+                                <i class="fas fa-pencil-alt fa-lg text-success"></i>
+                            {% elif notif.action_type == 'best_answer' %}
+                                <i class="fas fa-star fa-lg text-warning"></i>
+                            {% elif notif.action_type == 'new_badge' %}
+                                {# Use badge_icon_class and badge_icon_color passed from the route for this notification #}
+                                <i class="{{ notif.badge_icon_class|default('fas fa-medal') }} fa-lg" 
+                                   style="color: {{ notif.badge_icon_color|default('var(--secondary-color)') }};"></i>
+                            {% else %}
+                                <i class="fas fa-info-circle fa-lg text-muted"></i>
+                            {% endif %}
+                        </div>
+                        <div class="notification-text-wrapper flex-grow-1">
+                            <div class="d-flex w-100 justify-content-between">
+                                <p class="mb-1 notification-message">{{ notif.human_readable_message|safe }}</p>
+                                <small class="text-muted notification-timestamp" title="{{ notif.timestamp.strftime('%Y-%m-%d %H:%M:%S UTC') }}">
+                                    {{ notif.timestamp.strftime('%b %d, %H:%M') }}
+                                </small>
+                            </div>
+                            {# Optional: Snippet can be added here if passed from backend #}
+                        </div>
+                    </div>
+                </a>
+            </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <div class="empty-state mt-3">
+            <i class="far fa-bell-slash fa-3x text-muted mb-3"></i>
+            <p>You have no notifications yet.</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Ensure these functions are globally available or defined within this scope
+    // For simplicity, assuming they are available from main.js
+    // function updateNavbarNotificationCount(count) { /* ... */ }
+    // function showFlashMessage(message, category) { /* ... */ }
+    
+    // It's better if updateNavbarNotificationCount and showFlashMessage are globally accessible
+    // or passed/imported if using modules. For now, let's define them if not found.
+    if (typeof updateNavbarNotificationCount === 'undefined') {
+        window.updateNavbarNotificationCount = function(count) {
+            const countBadge = document.getElementById('notification-count-badge');
+            if (countBadge) {
+                count = parseInt(count) || 0;
+                if (count > 0) {
+                    countBadge.textContent = count;
+                    countBadge.style.display = 'inline-block';
+                } else {
+                    countBadge.style.display = 'none';
+                }
+            }
+        };
+    }
+
+    if (typeof showFlashMessage === 'undefined') {
+        window.showFlashMessage = function(message, category, containerSelector = 'main.container .page-header, main.container:first-child') {
+            let flashContainer = document.querySelector(containerSelector);
+            if (!flashContainer) { flashContainer = document.querySelector('main.container') || document.body; }
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${category} alert-dismissible fade show`;
+            alertDiv.setAttribute('role', 'alert');
+            alertDiv.innerHTML = message;
+            const closeBtn = document.createElement('button');
+            closeBtn.type = 'button'; closeBtn.className = 'alert-close-btn';
+            closeBtn.innerHTML = '×'; closeBtn.setAttribute('aria-label', 'Close');
+            closeBtn.onclick = function() { if (alertDiv.parentElement) alertDiv.remove(); }; // Simplified dismiss
+            alertDiv.appendChild(closeBtn);
+            if (flashContainer.firstChild) flashContainer.insertBefore(alertDiv, flashContainer.firstChild);
+            else flashContainer.appendChild(alertDiv);
+            setTimeout(() => { if (alertDiv.parentElement) alertDiv.remove(); }, 7000);
+        };
+    }
+
+
+    document.querySelectorAll('.notification-link').forEach(link => {
+        link.addEventListener('click', function(e) {
+            // Allow default navigation, but mark as read in background
+            const listItem = this.closest('.notification-item');
+            if (listItem && listItem.classList.contains('notification-unread')) {
+                const notificationId = listItem.dataset.notificationId;
+                fetch(`/notifications/mark_read/${notificationId}`, {
+                    method: 'POST',
+                    headers: {'X-Requested-With': 'XMLHttpRequest' /*, CSRF */}
+                }).then(response => response.json())
+                  .then(data => {
+                      if(data.status === 'success') {
+                          listItem.classList.remove('notification-unread');
+                          listItem.classList.add('notification-read');
+                          updateNavbarNotificationCount(data.new_unread_count);
+                      }
+                  }).catch(err => console.error("Error marking notification as read", err));
+            }
+        });
+    });
+
+    const markAllReadBtn = document.getElementById('mark-all-read-btn');
+    if (markAllReadBtn) {
+        markAllReadBtn.addEventListener('click', async function() {
+            const originalButtonHTML = this.innerHTML;
+            this.disabled = true;
+            this.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i> Marking...';
+            const markAllReadUrl = this.dataset.markAllUrl; // Get URL from data attribute
+
+            if (!markAllReadUrl) {
+                console.error("Mark all read URL not found on button's data attribute.");
+                this.disabled = false; this.innerHTML = originalButtonHTML;
+                showFlashMessage('Configuration error for marking all read.', 'danger', '.page-header');
+                return;
+            }
+
+            try {
+                const response = await fetch(markAllReadUrl, {
+                    method: 'POST',
+                    headers: {'X-Requested-With': 'XMLHttpRequest' /*, CSRF */}
+                });
+                const result = await response.json();
+                if (response.ok && result.status === 'success') {
+                    document.querySelectorAll('.notification-item.notification-unread').forEach(item => {
+                        item.classList.remove('notification-unread');
+                        item.classList.add('notification-read');
+                    });
+                    updateNavbarNotificationCount(0);
+                    this.style.display = 'none';
+                    showFlashMessage('All notifications marked as read.', 'success', '.page-header');
+                } else {
+                    showFlashMessage(result.message || 'Could not mark all as read.', 'danger', '.page-header');
+                    this.disabled = false; this.innerHTML = originalButtonHTML;
+                }
+            } catch (error) {
+                console.error('Mark all read error:', error);
+                showFlashMessage('An error occurred while marking all notifications.', 'danger', '.page-header');
+                this.disabled = false; this.innerHTML = originalButtonHTML;
+            }
+        });
+    }
+});
+</script>
+<style>
+    /* Styles for notifications.html page - can be moved to style.css */
+    .page-container.mt-3 { margin-top: 1.5rem !important; }
+    .page-header { margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border-color); }
+    .page-header h1 i { font-size: 0.9em; }
+    .page-header .btn-sm i { margin-right: 0.3rem !important; }
+
+    .notification-list { list-style: none; padding: 0; }
+    .notification-item {
+        border-bottom: 1px solid var(--border-color);
+        padding: 1rem 1.25rem;
+        transition: background-color 0.2s ease;
+        background-color: var(--card-bg);
+    }
+    .notification-item:first-child {
+        border-top: 1px solid var(--border-color);
+        border-top-left-radius: var(--border-radius-lg);
+        border-top-right-radius: var(--border-radius-lg);
+    }
+    .notification-item:last-child {
+        border-bottom: none;
+        border-bottom-left-radius: var(--border-radius-lg);
+        border-bottom-right-radius: var(--border-radius-lg);
+    }
+    .notification-item:only-child { border-radius: var(--border-radius-lg); }
+
+    .notification-item a.notification-link {
+        color: inherit;
+        text-decoration: none;
+        display: block;
+    }
+    .notification-item:hover { background-color: var(--bg-color); }
+    .notification-unread {
+        background-color: var(--primary-color-light) !important;
+        /* font-weight: 500; */
+    }
+    .notification-unread:hover { background-color: #b8d6ff !important; /* Needs a teal-based light hover, e.g. var(--primary-color-light-hover) */ }
+    .notification-read { opacity: 0.9; }
+    .notification-read:hover { opacity: 1; }
+
+    .notification-content { gap: 0.75rem; }
+    .notification-icon { flex-shrink: 0; width: 30px; text-align: center; }
+    .notification-icon .fa-lg { font-size: 1.5em; } /* Slightly larger icons */
+
+    .notification-message { color: var(--text-color); font-size: 0.95rem; margin-bottom: 0 !important; }
+    .notification-message strong { color: var(--heading-color); font-weight: 600; }
+    .notification-timestamp { font-size: 0.8em; white-space: nowrap; color: var(--text-color-light); }
+    .notification-snippet { font-size: 0.875em; color: var(--text-color-light); padding-left: 10px; border-left: 2px solid var(--border-color); margin-left: 5px; margin-top: 0.25rem; display: block; }
+    
+    .empty-state .fa-bell-slash { font-size: 3rem; margin-bottom: 1rem; }
+</style>
+{% endblock %}

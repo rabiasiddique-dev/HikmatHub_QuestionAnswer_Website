@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+env/
+ENV/
+
+# Flask & Environment
+.env
+instance/
+.pytest_cache/
+
+# VS Code & OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.log
+
+# Static files
+static/img/hero-bg.png
+# (Exclude specific generated assets if needed, but for now we might want to keep some if they are part of the theme)

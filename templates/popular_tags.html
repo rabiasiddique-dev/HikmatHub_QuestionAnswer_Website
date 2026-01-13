@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }} - Hikmat Hub{% endblock %}
+
+{% block content %}
+<div class="container page-container mt-3">
+    <header class="page-header">
+        <h1><i class="fas fa-tags text-primary mr-2"></i>{{ title }}</h1>
+        <p class="text-muted">Explore topics by browsing the most frequently used tags in our community.</p>
+    </header>
+
+    {% if tags %}
+        <div class="popular-tags-grid">
+            {% for tag_info in tags %}
+            <a href="{{ url_for('search_results', tag=tag_info._id) }}" class="tag-popular">
+                <span class="tag-name">{{ tag_info._id }}</span>
+                <span class="tag-count">{{ tag_info.count }} question{{ 's' if tag_info.count != 1 else '' }}</span>
+            </a>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <i class="fas fa-tag fa-3x text-muted mb-3"></i>
+            <p>No popular tags found yet. Start asking questions with tags!</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<style>
+    .popular-tags-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 1rem;
+        margin-top: 1.5rem;
+    }
+    .tag-popular {
+        display: block;
+        padding: 0.75rem 1rem;
+        background-color: var(--card-bg);
+        border: 1px solid var(--border-color);
+        border-radius: var(--border-radius);
+        text-decoration: none;
+        color: var(--text-color);
+        transition: var(--transition-normal);
+        box-shadow: var(--shadow-xs);
+    }
+    .tag-popular:hover {
+        transform: translateY(-3px);
+        box-shadow: var(--shadow-sm);
+        border-left: 3px solid var(--primary-color);
+        color: var(--primary-color);
+    }
+    .tag-popular .tag-name {
+        font-weight: 600;
+        display: block;
+        margin-bottom: 0.25rem;
+        font-size: 1.05rem;
+        word-break: break-all;
+    }
+    .tag-popular .tag-count {
+        font-size: 0.8rem;
+        color: var(--text-color-light);
+    }
+</style>
+{% endblock %}

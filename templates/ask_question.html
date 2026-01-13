@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="form-container">
+    <h2>Ask a New Question</h2>
+    <form method="POST" action="">
+        {{ form.hidden_tag() }} <!-- CSRF token -->
+        <div class="form-group">
+            {{ form.title.label(class="form-label") }}
+            {{ form.title(class="form-control", placeholder="e.g., How does photosynthesis work?") }}
+            {% if form.title.errors %}
+                {% for error in form.title.errors %}<span class="form-error">{{ error }}</span>{% endfor %}
+            {% endif %}
+        </div>
+        <div class="form-group">
+            {{ form.body.label(class="form-label") }}
+            {{ form.body(class="form-control textarea-body", rows="8", placeholder="Provide all the details about your question...") }}
+            {% if form.body.errors %}
+                {% for error in form.body.errors %}<span class="form-error">{{ error }}</span>{% endfor %}
+            {% endif %}
+        </div>
+        <div class="form-group">
+            {{ form.tags.label(class="form-label") }}
+            {{ form.tags(class="form-control", placeholder="e.g., science, biology, plants") }}
+            {% if form.tags.errors %}
+                {% for error in form.tags.errors %}<span class="form-error">{{ error }}</span>{% endfor %}
+            {% endif %}
+        </div>
+        <div class="form-group">
+            {{ form.submit(class="btn btn-primary") }}
+        </div>
+    </form>
+</div>
+{% endblock %}

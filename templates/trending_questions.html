@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }} - Hikmat Hub{% endblock %}
+
+{% block content %}
+<div class="container page-container mt-3">
+    <header class="page-header">
+        <h1><i class="fas fa-fire text-danger mr-2"></i>{{ title }}</h1>
+        <p class="text-muted">Discover the most discussed and highest-rated questions right now.</p>
+    </header>
+
+    {% if questions %}
+        <section class="questions-list">
+            {% for question in questions %}
+                {% include 'partials/_question_card.html' %} {# Reusing the question card #}
+            {% endfor %}
+        </section>
+
+        {# Pagination (Copy from index.html or search_results.html and adjust url_for endpoint) #}
+        {% if total_pages > 1 %}
+        <nav aria-label="Page navigation" class="mt-4">
+            <ul class="pagination">
+                <li class="page-item {% if page == 1 %}disabled{% endif %}">
+                    <a class="page-link" href="{{ url_for('trending_questions', page=page-1) if page > 1 else '#' }}">«</a>
+                </li>
+                {% set start_page = [1, page-2] | max %}
+                {% set end_page = [total_pages, page+2] | min %}
+                {% if start_page > 1 %}
+                    <li class="page-item"><a class="page-link" href="{{ url_for('trending_questions', page=1) }}">1</a></li>
+                    {% if start_page > 2 %}<li class="page-item disabled"><span class="page-link">...</span></li>{% endif %}
+                {% endif %}
+                {% for p in range(start_page, end_page + 1) %}
+                <li class="page-item {% if p == page %}active{% endif %}">
+                    <a class="page-link" href="{{ url_for('trending_questions', page=p) }}">{{ p }}</a>
+                </li>
+                {% endfor %}
+                {% if end_page < total_pages %}
+                    {% if end_page < total_pages - 1 %}<li class="page-item disabled"><span class="page-link">...</span></li>{% endif %}
+                    <li class="page-item"><a class="page-link" href="{{ url_for('trending_questions', page=total_pages) }}">{{ total_pages }}</a></li>
+                {% endif %}
+                <li class="page-item {% if page == total_pages %}disabled{% endif %}">
+                    <a class="page-link" href="{{ url_for('trending_questions', page=page+1) if page < total_pages else '#' }}">»</a>
+                </li>
+            </ul>
+        </nav>
+        {% endif %}
+
+    {% else %}
+        <div class="empty-state">
+            <i class="fas fa-meh fa-3x text-muted mb-3"></i>
+            <p>No trending questions found at the moment.</p>
+            <p>Why not <a href="{{ url_for('ask_question') }}">ask a new question</a> or browse <a href="{{ url_for('index') }}">all questions</a>?</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,85 @@
+{% extends "base.html" %} {# Assuming you have a base.html in your main templates folder #}
+
+{% block title %}Server Error - Hikmat Hub{% endblock %}
+
+{% block content %}
+<div class="error-page-container text-center">
+    <div class="error-icon">
+        <i class="fas fa-cogs fa-5x text-danger"></i> {# FontAwesome Icon #}
+    </div>
+    <h1 class="error-code display-1 font-weight-bold mt-4">500</h1>
+    <h2 class="error-message h3">Oops! Something Went Wrong.</h2>
+    <p class="error-description lead text-muted mb-4">
+        We are currently experiencing some technical difficulties on our server.
+        Our team has been notified and is working to resolve the issue.
+    </p>
+    <p class="error-suggestion">
+        Please try refreshing the page in a few moments or return to the homepage.
+    </p>
+    <div class="mt-5">
+        <a href="{{ url_for('index') }}" class="btn btn-primary btn-lg">
+            <i class="fas fa-home mr-2"></i> Go to Homepage
+        </a>
+        <a href="javascript:location.reload();" class="btn btn-outline-secondary btn-lg ml-2">
+            <i class="fas fa-sync-alt mr-2"></i> Try Again
+        </a>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }} {# Include scripts from base.html if any #}
+<style>
+/* Styles are similar to 404.html, you can reuse or define them in style.css */
+.error-page-container {
+    padding: 50px 20px;
+    margin: 30px auto;
+    max-width: 700px;
+    background-color: #fff; /* Or var(--card-bg) */
+    border-radius: 8px; /* Or var(--border-radius) */
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08); /* Or var(--shadow) */
+}
+.error-icon .fa-cogs {
+    color: #dc3545; /* Bootstrap danger color */
+}
+.error-code {
+    color: #dc3545; /* Bootstrap danger color or your primary color */
+    font-family: 'Poppins', sans-serif; /* Or var(--font-primary) */
+}
+.error-message {
+    color: #343a40; /* Dark grey */
+    font-weight: 600;
+}
+.lead {
+    font-size: 1.15rem;
+    font-weight: 300;
+}
+.text-muted {
+    color: #6c757d !important;
+}
+.btn-lg {
+    padding: 0.75rem 1.5rem;
+    font-size: 1.1rem;
+}
+.mr-2 {
+    margin-right: 0.5rem !important;
+}
+.ml-2 {
+    margin-left: 0.5rem !important;
+}
+.text-center {
+    text-align: center !important;
+}
+.font-weight-bold {
+    font-weight: 700 !important;
+}
+.display-1 {
+    font-size: 6rem; /* Adjust as needed */
+    font-weight: 300;
+    line-height: 1.2;
+}
+.mt-4 { margin-top: 1.5rem !important; }
+.mt-5 { margin-top: 3rem !important; }
+.mb-4 { margin-bottom: 1.5rem !important; }
+</style>
+{% endblock %}

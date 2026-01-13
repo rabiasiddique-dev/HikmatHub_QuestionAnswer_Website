@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block title %}{{ title }} - Hikmat Hub{% endblock %}
+
+{% block content %}
+<div class="container page-container static-page-content mt-3">
+    <header class="page-header">
+        <h1><i class="fas fa-users text-primary mr-2"></i>{{ title }}</h1>
+        <p class="text-muted">Our commitment to a respectful and constructive community.</p>
+    </header>
+
+    <section>
+        <p>Welcome to Hikmat Hub! We are excited to have you as part of our community dedicated to sharing knowledge and insights. To ensure a positive and productive environment for everyone, we ask all members to adhere to the following guidelines:</p>
+
+        <h2>1. Be Respectful and Courteous</h2>
+        <p>Treat all members with respect, even if you disagree with them. Personal attacks, harassment, hate speech, or any form of bullying will not be tolerated. Healthy debate is encouraged, but it must remain civil and focused on the topic, not on individuals.</p>
+
+        <h2>2. Stay On-Topic and Constructive</h2>
+        <p>Keep your questions, answers, and comments relevant to the original topic. Provide constructive feedback and engage in discussions that add value to the community. Avoid spamming, off-topic discussions, or promotional content unless it is explicitly relevant and helpful.</p>
+
+        <h2>3. Ask Clear and Thoughtful Questions</h2>
+        <p>When asking a question, provide sufficient context and be as clear as possible. This helps others understand your query and provide relevant answers. Use appropriate tags to categorize your question.</p>
+
+        <h2>4. Provide Quality and Accurate Answers</h2>
+        <p>When answering a question, strive to provide accurate, well-researched, and helpful information. If you are speculating or providing an opinion, please state so. Cite sources where appropriate.</p>
+        
+        <h2>5. No Plagiarism or Copyright Infringement</h2>
+        <p>Only post content that you have the right to share. Do not plagiarize or violate copyright laws. If you are sharing content from an external source, give proper credit and link back to the original source if possible.</p>
+
+        <h2>6. Protect Privacy</h2>
+        <p>Do not share personal or confidential information about yourself or others without consent. Respect the privacy of all community members.</p>
+
+        <h2>7. Report Inappropriate Content</h2>
+        <p>If you see any content or behavior that violates these guidelines, please report it to the moderators. This helps us maintain a safe and welcoming environment.</p>
+        
+        <h2>8. Moderation</h2>
+        <p>Our moderators are here to help maintain a healthy community. They have the right to edit, move, or remove content that violates these guidelines, and to suspend or ban users who repeatedly disregard the rules. Decisions made by moderators should be respected.</p>
+
+        <p class="mt-4">By participating in Hikmat Hub, you agree to follow these community guidelines. We believe that by working together, we can create a valuable resource for everyone. Thank you for being a part of our community!</p>
+    </section>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+{# Add specific JS for this page if needed #}
+<style>
+    /* Styles from previous static_page example can be reused or put in style.css */
+    .static-page-content h2 {
+        font-size: 1.5rem;
+        margin-top: 2rem;
+        margin-bottom: 0.75rem;
+        color: var(--primary-color);
+        padding-bottom: 0.25rem;
+        border-bottom: 1px solid var(--primary-color-light);
+    }
+</style>
+{% endblock %}

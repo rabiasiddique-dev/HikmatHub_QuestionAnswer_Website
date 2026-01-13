@@ -1,0 +1,40 @@
+/* In static/css/animations.css or style.css */
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideInUp {
+    from { transform: translateY(40px); opacity: 0; } /* Increased Y offset */
+    to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes slideInDown {
+    from { transform: translateY(-30px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes popIn {
+    0% { transform: scale(0.7); opacity: 0; }
+    80% { transform: scale(1.05); }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes pulse { /* For subtle attention grabbing */
+    0% { box-shadow: 0 0 0 0 rgba(var(--primary-color-rgb, 99, 102, 241), 0.4); }
+    70% { box-shadow: 0 0 0 10px rgba(var(--primary-color-rgb, 99, 102, 241), 0); }
+    100% { box-shadow: 0 0 0 0 rgba(var(--primary-color-rgb, 99, 102, 241), 0); }
+}
+
+/* Apply animations */
+.question-card, .answer-card, .form-container, .profile-header-card, .profile-content-tabs {
+    animation: fadeIn 0.6s ease-out forwards, slideInUp 0.6s ease-out forwards; /* Combined effect */
+}
+
+/* Staggered list animation (if you have many items, needs JS to add delay or use :nth-child) */
+/*
+.question-list-item:nth-child(1) { animation-delay: 0.1s; }
+.question-list-item:nth-child(2) { animation-delay: 0.2s; }
+...
+*/

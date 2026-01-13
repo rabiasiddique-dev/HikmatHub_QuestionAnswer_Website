@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}{{ title }} - Hikmat Hub{% endblock %}
+
+{% block content %}
+<div class="container page-container static-page-content mt-3">
+    <header class="page-header">
+        <h1><i class="fas fa-info-circle text-primary mr-2"></i>{{ title }}</h1>
+        <p class="text-muted">Learn more about our mission, vision, and the team behind Hikmat Hub.</p>
+    </header>
+
+    <section>
+        <h2>Our Mission</h2>
+        <p>At Hikmat Hub, our mission is to create a vibrant and accessible platform where individuals can freely share knowledge, ask intriguing questions, and find insightful answers. We aim to foster a community of learners, thinkers, and experts dedicated to collaborative problem-solving and intellectual growth.</p>
+
+        <h2>Our Vision</h2>
+        <p>We envision Hikmat Hub as a leading online destination for knowledge exchange, recognized for its quality content, engaged community, and user-friendly experience. We strive to empower individuals by making information and expertise readily available, helping them to learn, innovate, and make informed decisions.</p>
+        
+        <h2>What is Hikmat Hub?</h2>
+        <p>Hikmat Hub is a community-driven question and answer website where users can:
+            <ul>
+                <li>Ask questions on a wide range of topics.</li>
+                <li>Provide well-reasoned and helpful answers.</li>
+                <li>Comment on questions and answers to seek clarification or add further insights.</li>
+                <li>Vote on the quality of questions and answers.</li>
+                <li>Build reputation and earn badges based on their contributions.</li>
+                <li>Connect with like-minded individuals and experts.</li>
+            </ul>
+        </p>
+
+        <h2>Our Story (Placeholder)</h2>
+        <p>Hikmat Hub was founded in [Year] by a group of passionate individuals who believed in the power of collective wisdom. Frustrated by the difficulty of finding reliable answers to complex questions scattered across the internet, they decided to create a centralized platform focused on quality and community. [Add more details about your founding story, motivations, and key milestones].</p>
+        
+        <h2>The Team (Placeholder)</h2>
+        <p>Our dedicated team at Hikmat Hub is committed to continuously improving the platform and supporting our community. [Introduce key team members if applicable, or keep it general]. We are always open to feedback and suggestions to make Hikmat Hub better for everyone.</p>
+
+        <h2>Join Us!</h2>
+        <p>Whether you have a burning question, a piece of knowledge to share, or simply a desire to learn, Hikmat Hub welcomes you. <a href="{{ url_for('register') }}">Join our community today</a> and be a part of our journey to build a world richer in shared wisdom.</p>
+        
+        <p class="mt-4">For any inquiries, please feel free to <a href="#footer-contact-form">contact us</a>.</p>
+    </section>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<style>
+    .static-page-content h2 { font-size: 1.5rem; margin-top: 2rem; margin-bottom: 0.75rem; color: var(--primary-color); padding-bottom: 0.25rem; border-bottom: 1px solid var(--primary-color-light); }
+    .static-page-content ul { margin-left: 1.5rem; margin-bottom: 1rem; }
+</style>
+{% endblock %}

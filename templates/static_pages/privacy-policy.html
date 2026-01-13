@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% block title %}{{ title }} - Hikmat Hub{% endblock %}
+
+{% block content %}
+<div class="container page-container static-page-content mt-3">
+    <header class="page-header">
+        <h1><i class="fas fa-user-secret text-primary mr-2"></i>{{ title }}</h1>
+        <p class="text-muted">Your privacy is important to us. This policy explains how we collect, use, and protect your information.</p>
+    </header>
+
+    <section>
+        <p><em>Last Updated: {{ now.strftime('%B %d, %Y') }}</em></p>
+
+        <h2>1. Information We Collect</h2>
+        <p>We collect information to provide and improve our services to all our users. The types of information we collect include:</p>
+        <ul>
+            <li><strong>Information you provide us:</strong> When you register for an account, we ask for personal information like your name, email address, and username. You may also provide other information, such as a bio or profile picture.</li>
+            <li><strong>Information we get from your use of our services:</strong> We may collect information about the services that you use and how you use them. This includes:
+                <ul>
+                    <li>Log information (e.g., IP address, browser type, access times).</li>
+                    <li>Content you create (questions, answers, comments).</li>
+                    <li>Cookies and similar technologies.</li>
+                </ul>
+            </li>
+            <li><strong>Information from third parties:</strong> If you use Google Login, we receive information from Google such as your email address and name, as permitted by your Google privacy settings.</li>
+        </ul>
+
+        <h2>2. How We Use Information We Collect</h2>
+        <p>We use the information we collect to:</p>
+        <ul>
+            <li>Provide, maintain, protect, and improve our services.</li>
+            <li>Develop new services.</li>
+            <li>Personalize content and user experience.</li>
+            <li>Communicate with you, including sending service-related notifications and responding to your inquiries.</li>
+            <li>Enforce our Terms of Service and Community Guidelines.</li>
+            <li>Analyze usage to understand how our services are used.</li>
+        </ul>
+
+        <h2>3. Information Sharing</h2>
+        <p>We do not share your personal information with companies, organizations, or individuals outside of Hikmat Hub except in the following cases:</p>
+        <ul>
+            <li><strong>With your consent:</strong> We will share personal information with companies, organizations or individuals outside of Hikmat Hub when we have your consent to do so.</li>
+            <li><strong>For legal reasons:</strong> We will share personal information if we have a good-faith belief that access, use, preservation or disclosure of the information is reasonably necessary to meet any applicable law, regulation, legal process or enforceable governmental request.</li>
+            <li><strong>For external processing:</strong> We may provide personal information to our affiliates or other trusted businesses or persons to process it for us, based on our instructions and in compliance with our Privacy Policy and any other appropriate confidentiality and security measures.</li>
+        </ul>
+        <p>Your username and any content you post (questions, answers, comments, bio) are publicly visible.</p>
+
+        <h2>4. Data Security</h2>
+        <p>We work hard to protect Hikmat Hub and our users from unauthorized access to or unauthorized alteration, disclosure or destruction of information we hold. We use encryption (HTTPS) for data transmission and review our information collection, storage and processing practices regularly.</p>
+
+        <h2>5. Your Choices and Rights</h2>
+        <p>You can review and update your account information through your profile settings. You may also delete your account, which will remove your personal information from active use, though some content you posted may remain visible (e.g., questions, answers) attributed to an anonymized user or as "deleted user".</p>
+
+        <h2>6. Cookies</h2>
+        <p>We use cookies to store information, such as your login session. You can configure your browser to refuse all cookies or to indicate when a cookie is being sent. However, some website features or services may not function properly without cookies.</p>
+
+        <h2>7. Changes to This Privacy Policy</h2>
+        <p>Our Privacy Policy may change from time to time. We will post any privacy policy changes on this page and, if the changes are significant, we will provide a more prominent notice (including, for certain services, email notification of privacy policy changes).</p>
+
+        <h2>8. Contact Us</h2>
+        <p>If you have any questions about this Privacy Policy, please contact us through the means provided on our website or at [your_privacy_contact_email@example.com].</p>
+    </section>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<style>
+    .static-page-content h2 { font-size: 1.5rem; margin-top: 2rem; margin-bottom: 0.75rem; color: var(--primary-color); padding-bottom: 0.25rem; border-bottom: 1px solid var(--primary-color-light); }
+    .static-page-content ul { margin-left: 1.5rem; margin-bottom: 1rem; }
+    .static-page-content ul ul { margin-top: 0.5rem; }
+</style>
+{% endblock %}

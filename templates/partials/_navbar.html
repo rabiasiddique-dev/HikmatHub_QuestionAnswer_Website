@@ -1,0 +1,56 @@
+{# templates/partials/_navbar.html #}
+<nav class="navbar">
+    <div class="container nav-container">
+        <a href="{{ url_for('index') }}" class="nav-logo-link">
+            {# --- FontAwesome Icon --- #}
+            <i class="fas fa-brain nav-logo-icon"></i> {# Ya fa-lightbulb, fa-atom, fa-hubspot #}
+            {# --- END Icon --- #}
+            <span class="nav-logo-text">Hikmat Hub</span>
+        </a>
+
+        <form method="GET" action="{{ url_for('search_results') }}" class="nav-search-form">
+            <input type="search" name="query" placeholder="Search questions..." aria-label="Search questions"
+                value="{{ request.args.get('query', '') }}">
+            <button type="submit"><i class="fas fa-search"></i></button>
+        </form>
+
+        <ul class="nav-menu">
+            <li><a href="{{ url_for('index') }}">Home</a></li>
+            <li><a href="{{ url_for('ask_question') }}" class="btn-nav-ask">Ask Question</a></li>
+            <li class="theme-toggle-item">
+                <button id="theme-toggle" class="theme-toggle-btn" title="Toggle dark/light mode">
+                    <i class="fas fa-moon"></i>
+                </button>
+            </li>
+            {% if current_user.is_authenticated %}
+            <li class="nav-item-notifications dropdown">
+                <a href="{{ url_for('view_notifications_page') }}" class="nav-link notification-bell-link"
+                    title="Notifications" id="notificationsDropdown" role="button" data-toggle="dropdown"
+                    aria-haspopup="true" aria-expanded="false">
+                    <i class="fas fa-bell"></i>
+                    {% if unread_notifications_count > 0 %}
+                    <span class="badge badge-danger notification-count" id="notification-count-badge">{{
+                        unread_notifications_count }}</span>
+                    {% endif %}
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="{{ url_for('profile', username=current_user.username) }}" class="nav-link profile-nav-link">
+                    <span class="nav-level-badge"
+                        title="Level {{ current_user_level.current_level if current_user_level else '?' }}">
+                        L{{ current_user_level.current_level if current_user_level else 1 }}
+                    </span>
+                    {{ current_user.username }}
+                </a>
+            </li>
+            <li><a href="{{ url_for('logout') }}">Logout</a></li>
+            {% else %}
+            <li><a href="{{ url_for('login') }}">Login</a></li>
+            <li><a href="{{ url_for('register') }}">Register</a></li>
+            {% endif %}
+        </ul>
+        <div class="nav-toggler">
+            <span></span><span></span><span></span>
+        </div>
+    </div>
+</nav>

@@ -1,0 +1,235 @@
+{% extends "base.html" %}
+
+{% block title %}{{ user_profile.username }}'s Profile - Hikmat Hub{% endblock %}
+
+{% block content %}
+<div class="profile-page-container">
+    <header class="profile-header-card">
+        <div class="profile-avatar-large">
+            {# Simple text avatar, replace with image logic if you implement image uploads #}
+            {{ user_profile.username[0]|upper if user_profile.username else 'U' }}
+        </div>
+        {% set level = calculate_level(user_profile.reputation|default(0)) %}
+        <div class="profile-rank-badge" title="Rank: {{ level.title }}">
+            <i class="fas {{ level.icon }}"></i>
+            <span>Level {{ level.current_level }}</span>
+        </div>
+
+        <h1 class="profile-username">{{ user_profile.username }}</h1>
+        <p class="profile-rank-title">{{ level.title }}</p>
+
+        {% if user_profile.email %}
+        <p class="profile-email"><i class="fas fa-envelope mr-2"></i>{{ user_profile.email }}</p>
+        {% endif %}
+
+        <div class="level-progress-container mt-3">
+            <div class="progress-details">
+                <span>Next Milestone: <strong>{{ level.next_level_rep if level.next_level_rep else 'MAX' }} Rep</strong></span>
+                <span>{{ level.progress }}%</span>
+            </div>
+            <div class="profile-progress-bar">
+                <div class="progress-fill" style="width: {{ level.progress }}%;"></div>
+            </div>
+            {% if level.remaining_rep > 0 %}
+            <p class="small text-muted mt-1">{{ level.remaining_rep }} reputation points to next level.</p>
+            {% endif %}
+        </div>
+
+        <div class="profile-bio mt-3 mb-3">
+            {% if user_profile.bio %}
+            <p class="text-muted">{{ user_profile.bio }}</p>
+            {% else %}
+            <p class="text-muted font-italic">No bio provided yet.</p>
+            {% endif %}
+        </div>
+        <div class="profile-stats">
+            <span><i class="fas fa-star mr-1"></i> {{ user_profile.reputation|default(0) }} Reputation</span>
+            <span><i class="fas fa-calendar-alt mr-1"></i> Joined: {{ user_profile.joined_date.strftime('%B %d, %Y') if user_profile.joined_date else 'N/A' }}</span>
+        </div>
+        {% if current_user.is_authenticated and current_user.id == user_profile._id|string %}
+        <a href="{{ url_for('edit_profile') }}" class="btn btn-outline-primary btn-sm edit-profile-btn" title="Edit Your Profile">
+            <i class="fas fa-edit mr-1"></i> Edit Profile
+        </a>
+        {% endif %}
+    </header>
+
+    <div class="profile-grid-layout">
+        <div class="profile-main-column">
+            {% if awarded_badges %}
+            <section class="profile-badges-section card-section mb-3" id="profile-badges-section">
+                <h3 class="section-title"><i class="fas fa-medal mr-2"></i>Badges Earned ({{ awarded_badges|length }})</h3>
+                <div class="badges-grid">
+                    {% for badge in awarded_badges %}
+                    <div class="badge-item" title="{{ badge.name }} - {{ badge.description }} (Awarded: {{ badge.awarded_at.strftime('%b %d, %Y') if badge.awarded_at else 'N/A' }})">
+                        <span class="badge-icon" style="color: {{ badge.icon_color|default('var(--primary-color)') }};">
+                            <i class="{{ badge.icon_class|default('fas fa-medal') }}"></i>
+                        </span>
+                        <span class="badge-name">{{ badge.name }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </section>
+            {% elif current_user.is_authenticated and current_user.id == user_profile._id|string %}
+            <section class="profile-badges-section card-section mb-3" id="profile-badges-section">
+                <h3 class="section-title"><i class="fas fa-medal mr-2"></i>Badges Earned</h3>
+                <p class="empty-state-profile-light">Start participating to earn badges!</p>
+            </section>
+            {% endif %}
+        </div>
+
+        <div class="profile-side-column">
+            <section class="profile-chart-section card-section mb-3">
+                <h3 class="section-title"><i class="fas fa-chart-line mr-2"></i>Reputation Growth</h3>
+                <div class="chart-container" style="position: relative; height:250px; width:100%">
+                    <canvas id="reputationChart"></canvas>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <section class="profile-content-tabs card-section">
+        <div class="tabs-nav">
+            <a href="#questions" class="tab-link" data-tab="questions">Questions ({{ questions|length }})</a>
+            <a href="#answers" class="tab-link" data-tab="answers">Answers ({{ answers_count }})</a>
+        </div>
+
+        <div id="questions" class="tab-content">
+            <h3 class="tab-content-title">Questions Asked</h3>
+            {% if questions %}
+            {% for question in questions %}
+            <article class="question-card-minimal">
+                <h4><a href="{{ url_for('view_question', question_id_str=question._id|string) }}">{{ question.title }}</a></h4>
+                <div class="question-meta-minimal">
+                    <span><i class="far fa-clock"></i> {{ question.timestamp.strftime('%b %d, %Y, %I:%M %p') }}</span>
+                    <span><i class="far fa-eye"></i> {{ question.views }} views</span>
+                    <span><i class="far fa-comments"></i> {{ question.answers_count }} answers</span>
+                    <span><i class="fas fa-thumbs-up"></i> {{ question.net_votes|default(0) }} votes</span>
+                </div>
+            </article>
+            {% endfor %}
+            {% else %}
+            <p class="empty-state-profile">You haven't asked any questions yet. <a href="{{ url_for('ask_question') }}">Ask one now!</a></p>
+            {% endif %}
+        </div>
+
+        <div id="answers" class="tab-content">
+            <h3 class="tab-content-title">Answers Provided</h3>
+            {% if user_answers %}
+            {% for answer in user_answers %}
+            <article class="answer-card-minimal">
+                <p class="answer-to-question">
+                    Answer to: <a href="{{ url_for('view_question', question_id_str=answer.question_id_str) }}"><em>{{ answer.question_title }}</em></a>
+                </p>
+                <div class="answer-body-preview">
+                    {{ answer.body|striptags|truncate(200, True, '...')|safe }}
+                </div>
+                <div class="answer-meta-minimal">
+                    <span><i class="far fa-clock"></i> {{ answer.timestamp.strftime('%b %d, %Y, %I:%M %p') }}</span>
+                    <span><i class="fas fa-thumbs-up"></i> {{ (answer.upvotes|length) - (answer.downvotes|length) }} votes</span>
+                </div>
+            </article>
+            {% endfor %}
+            {% else %}
+            <p class="empty-state-profile">You haven't answered any questions yet. <a href="{{ url_for('index') }}">Find a question to answer!</a></p>
+            {% endif %}
+        </div>
+    </section>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const tabLinks = document.querySelectorAll('.profile-content-tabs .tab-link');
+        const tabContents = document.querySelectorAll('.profile-content-tabs .tab-content');
+
+        function activateTab(tabName) {
+            if (!tabName) return;
+            tabLinks.forEach(link => {
+                link.classList.toggle('active', link.dataset.tab === tabName);
+            });
+            tabContents.forEach(content => {
+                content.classList.toggle('active', content.id === tabName);
+            });
+            if (history.pushState) {
+                history.pushState(null, null, '#' + tabName);
+            } else {
+                window.location.hash = '#' + tabName;
+            }
+        }
+
+        if (tabLinks.length > 0 && tabContents.length > 0) {
+            tabLinks.forEach(link => {
+                link.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const tabName = this.dataset.tab;
+                    activateTab(tabName);
+                });
+            });
+
+            let currentHash = window.location.hash.substring(1);
+            let tabExists = Array.from(tabLinks).some(link => link.dataset.tab === currentHash);
+
+            if (currentHash && tabExists && document.getElementById(currentHash)) {
+                activateTab(currentHash);
+            } else if (tabLinks.length > 0) {
+                activateTab(tabLinks[0].dataset.tab);
+            }
+        }
+
+        // --- Reputation Chart Logic ---
+        const ctx = document.getElementById('reputationChart');
+        if (ctx) {
+            const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
+            const gridColor = isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)';
+            const textColor = isDarkMode ? '#94A3B8' : '#4B5563';
+
+            const reputation = {{ user_profile.reputation|default(0) }};
+            const labels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
+            let data = [10, 25, 45, 80, 120, reputation];
+            
+            if (reputation <= 0) {
+                data = [0, 0, 0, 0, 0, 0];
+            }
+
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Reputation',
+                        data: data,
+                        borderColor: '#0D9488',
+                        backgroundColor: 'rgba(13, 148, 136, 0.1)',
+                        fill: true,
+                        tension: 0.4,
+                        borderWidth: 3,
+                        pointBackgroundColor: '#F59E0B',
+                        pointBorderColor: '#fff',
+                        pointHoverRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: gridColor },
+                            ticks: { color: textColor }
+                        },
+                        x: {
+                            grid: { display: false },
+                            ticks: { color: textColor }
+                        }
+                    }
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}

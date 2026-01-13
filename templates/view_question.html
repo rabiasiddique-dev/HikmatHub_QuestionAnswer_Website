@@ -1,0 +1,275 @@
+{% extends "base.html" %}
+
+{% block title %}{{ question.title }} - Hikmat Hub{% endblock %}
+
+{% block content %}
+<div class="container page-container mt-3"> {# Added page-container and margin-top #}
+    <article class="question-detail">
+        <div class="question-header">
+            <h1>{{ question.title }}</h1>
+            <div class="question-meta">
+                Asked by <a href="{{ url_for('profile', username=question.author_username) }}">{{
+                    question.author_username }}</a>
+                (Rep: {{ question.author_reputation|default(0) }})
+                on {{ question.timestamp.strftime('%B %d, %Y, %I:%M %p') }}
+                | {{ question.views }} views
+                | {{ question.net_votes|default(0) }} votes
+            </div>
+            <div class="question-tags">
+                {% for tag in question.tags %}
+                <a href="{{ url_for('search_results', tag=tag) }}" class="tag">{{ tag }}</a>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="question-body">
+            {{ question.body|markdown }}
+        </div>
+
+        <div class="voting-section" data-id="{{ question._id|string }}" data-type="question">
+            <button class="vote-btn upvote-item" data-item-id="{{ question._id|string }}" data-vote-type="upvote"
+                data-item-type="question" title="Good Question">
+                <i class="fas fa-thumbs-up"></i> <span id="q-upvotes-{{ question._id|string }}">{{
+                    question.upvotes|length }}</span>
+            </button>
+            <button class="vote-btn downvote-item" data-item-id="{{ question._id|string }}" data-vote-type="downvote"
+                data-item-type="question" title="Not a Good Question">
+                <i class="fas fa-thumbs-down"></i> <span id="q-downvotes-{{ question._id|string }}">{{
+                    question.downvotes|length }}</span>
+            </button>
+            {# You can also display net votes if preferred:
+            <span class="net-vote-display">Net: <span id="q-net-votes-{{ question._id|string }}">{{
+                    question.net_votes|default(0) }}</span></span>
+            #}
+        </div>
+
+        {# --- Comments for Question --- #}
+        <section class="comments-section" id="comments-question-{{ question._id|string }}">
+            <h5>Comments ({{ question.comments|length }})</h5>
+            <div class="comments-list">
+                {% if question.comments %}
+                {% for comment in question.comments %}
+                {% include 'partials/_comment.html' %}
+                {% endfor %}
+                {% else %}
+                <p class="small text-muted">No comments yet on this question.</p>
+                {% endif %}
+            </div>
+            {% if current_user.is_authenticated %}
+            <form class="comment-form mt-2" method="POST"
+                action="{{ url_for('add_comment', parent_type='question', parent_id_str=question._id|string) }}">
+                {# No need for comment_form.hidden_tag() as we are using JS for submission #}
+                <div class="form-group mb-1">
+                    {# Using comment_form passed from the route to render fields if needed, or direct HTML for
+                    simplicity with JS #}
+                    {{ comment_form.body(class="form-control form-control-sm comment-input", rows="2", placeholder="Add
+                    a public comment...") }}
+                    {% if comment_form.body.errors %} {# Display errors if form was submitted via traditional POST (not
+                    AJAX) and failed #}
+                    {% for error in comment_form.body.errors %}<span class="form-error small">{{ error }}</span>{%
+                    endfor %}
+                    {% endif %}
+                </div>
+                <button type="submit" class="btn btn-sm btn-outline-primary submit-comment-btn">Post Comment</button>
+            </form>
+            {% else %}
+            <p class="small text-muted mt-2"><em>Please <a href="{{ url_for('login', next=request.url) }}">login</a> to
+                    add a comment.</em></p>
+            {% endif %}
+        </section>
+        {# --- End Comments for Question --- #}
+    </article>
+
+    <section class="answers-section">
+        <h3>{{ answers|length }} Answer{{ 's' if answers|length != 1 else '' }}</h3>
+        {% if answers %}
+        {% for answer in answers %}
+        <article class="answer-card {% if answer.is_best %}best-answer-highlight{% endif %}"
+            id="answer-{{ answer._id|string }}">
+            {% if answer.is_best %}
+            <div class="best-answer-badge"><i class="fas fa-check-circle"></i> Best Answer</div>
+            {% endif %}
+            <div class="answer-meta">
+                <a href="{{ url_for('profile', username=answer.author_username) }}">{{ answer.author_username }}</a>
+                (Rep: {{ answer.author_reputation }})
+                answered on {{ answer.timestamp.strftime('%B %d, %Y, %I:%M %p') }}
+            </div>
+            <div class="answer-body">
+                {{ answer.body|markdown }}
+            </div>
+            <div class="actions-toolbar"> {# Toolbar for voting and marking best answer #}
+                <div class="voting-section" data-id="{{ answer._id|string }}" data-type="answer">
+                    <button class="vote-btn upvote-item" data-item-id="{{ answer._id|string }}" data-vote-type="upvote"
+                        data-item-type="answer" title="Helpful Answer">
+                        <i class="fas fa-thumbs-up"></i> <span id="a-upvotes-{{ answer._id|string }}">{{
+                            answer.upvotes|length }}</span>
+                    </button>
+                    <button class="vote-btn downvote-item" data-item-id="{{ answer._id|string }}"
+                        data-vote-type="downvote" data-item-type="answer" title="Not a Helpful Answer">
+                        <i class="fas fa-thumbs-down"></i> <span id="a-downvotes-{{ answer._id|string }}">{{
+                            answer.downvotes|length }}</span>
+                    </button>
+                    {# <span class="net-vote-display">Net: <span id="a-net-votes-{{ answer._id|string }}">{{
+                            answer.net_votes|default(0) }}</span></span> #}
+                </div>
+                {% if current_user.is_authenticated and question.author_id == current_user.id %}
+                {% if not answer.is_best %}
+                <form class="mark-best-answer-form" method="POST"
+                    action="{{ url_for('mark_best_answer', question_id_str=question._id|string, answer_id_str=answer._id|string) }}">
+                    <button type="submit" class="btn btn-sm btn-outline-success mark-best-btn"
+                        title="Mark as Best Answer">
+                        <i class="fas fa-check"></i> Mark as Best
+                    </button>
+                </form>
+                {% endif %}
+                {% endif %}
+            </div>
+
+
+            {# --- Comments for Answer --- #}
+            <section class="comments-section mt-3" id="comments-answer-{{ answer._id|string }}">
+                <h6>Comments ({{ answer.comments|length }})</h6>
+                <div class="comments-list">
+                    {% if answer.comments %}
+                    {% for comment in answer.comments %}
+                    {% include 'partials/_comment.html' %}
+                    {% endfor %}
+                    {% else %}
+                    <p class="small text-muted">No comments yet on this answer.</p>
+                    {% endif %}
+                </div>
+                {% if current_user.is_authenticated %}
+                <form class="comment-form mt-2" method="POST"
+                    action="{{ url_for('add_comment', parent_type='answer', parent_id_str=answer._id|string) }}">
+                    <div class="form-group mb-1">
+                        {{ comment_form.body(class="form-control form-control-sm comment-input", rows="2",
+                        placeholder="Add a public comment...") }}
+                        {% if comment_form.body.errors %}
+                        {% for error in comment_form.body.errors %}<span class="form-error small">{{ error }}</span>{%
+                        endfor %}
+                        {% endif %}
+                    </div>
+                    <button type="submit" class="btn btn-sm btn-outline-primary submit-comment-btn">Post
+                        Comment</button>
+                </form>
+                {% else %}
+                <p class="small text-muted mt-2"><em>Please <a href="{{ url_for('login', next=request.url) }}">login</a>
+                        to add a comment.</em></p>
+                {% endif %}
+            </section>
+            {# --- End Comments for Answer --- #}
+        </article>
+        {% endfor %}
+        {% else %}
+        <p class="empty-state mt-3"><i class="far fa-comment-dots mr-2"></i>No answers yet. Be the first to provide one!
+        </p>
+        {% endif %}
+    </section>
+
+    {% if current_user.is_authenticated %}
+    <section class="post-answer-section">
+        <h3>Your Answer</h3>
+        {# Action current page par hi, POST method se view_question mein handle hoga #}
+        <form method="POST" action="{{ url_for('view_question', question_id_str=question._id|string) }}">
+            {{ answer_form.hidden_tag() }} {# Changed from form to answer_form #}
+            <div class="form-group">
+                {{ answer_form.body.label(class="form-label sr-only") }} {# Changed from form to answer_form #}
+                {{ answer_form.body(class="form-control textarea-body", rows="6", placeholder="Write your insightful
+                answer here...") }} {# Changed from form to answer_form #}
+                {% if answer_form.body.errors %} {# Changed from form to answer_form #}
+                {% for error in answer_form.body.errors %}<span class="form-error">{{ error }}</span>{% endfor %}
+                {% endif %}
+            </div>
+            <div class="form-group">
+                {{ answer_form.submit(class="btn btn-primary btn-lg") }} {# Changed from form to answer_form, added
+                btn-lg #}
+            </div>
+        </form>
+    </section>
+    {% else %}
+    <p class="login-prompt">Please <a href="{{ url_for('login', next=request.url) }}">login</a> or <a
+            href="{{ url_for('register') }}">register</a> to post an answer.</p>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script>
+    // JavaScript for AJAX comment submission should be in main.js
+    // JavaScript for AJAX voting should be in main.js
+    // JavaScript for AJAX mark best answer (optional, or can be simple form post)
+    document.addEventListener('DOMContentLoaded', function () {
+        // Mark Best Answer AJAX (Optional - can also be a simple form POST and page reload)
+        document.querySelectorAll('.mark-best-answer-form').forEach(form => {
+            form.addEventListener('submit', async function (e) {
+                e.preventDefault();
+                const submitButton = this.querySelector('.mark-best-btn');
+                submitButton.disabled = true;
+                submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Marking...';
+
+                try {
+                    const response = await fetch(this.action, {
+                        method: 'POST',
+                        headers: { // Add CSRF token if your app uses them for POST via JS
+                            'X-Requested-With': 'XMLHttpRequest',
+                            // 'X-CSRFToken': getCsrfToken() // Function to get CSRF token
+                        }
+                    });
+                    const result = await response.json();
+                    if (response.ok && result.status === 'success') {
+                        // Reload the page to reflect changes, or update DOM dynamically
+                        window.location.reload();
+                        // For dynamic update:
+                        // 1. Remove "Mark as Best" from all answers
+                        // 2. Add "Best Answer" badge to the new best answer
+                        // 3. Highlight the new best answer card
+                    } else {
+                        showFlashMessage(result.message || 'Could not mark best answer.', 'danger'); // Assuming showFlashMessage exists
+                        submitButton.disabled = false;
+                        submitButton.innerHTML = '<i class="fas fa-check"></i> Mark as Best';
+                    }
+                } catch (error) {
+                    console.error('Mark best answer error:', error);
+                    showFlashMessage('An error occurred.', 'danger');
+                    submitButton.disabled = false;
+                    submitButton.innerHTML = '<i class="fas fa-check"></i> Mark as Best';
+                }
+            });
+        });
+    });
+</script>
+<style>
+    /* Additional styles for this page, or move to style.css */
+    .actions-toolbar {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-top: 1rem;
+        padding-top: 1rem;
+        border-top: 1px solid var(--border-color);
+    }
+
+    .mark-best-answer-form .btn-sm {
+        padding: 0.3rem 0.6rem;
+        font-size: 0.8rem;
+    }
+
+    .btn-outline-success {
+        /* Assuming you have this color in :root or define it */
+        color: var(--success-color);
+        border-color: var(--success-color);
+    }
+
+    .btn-outline-success:hover {
+        background-color: var(--success-color);
+        color: white;
+    }
+
+    .page-container.mt-3 {
+        margin-top: 1rem !important;
+    }
+
+    /* Reduce top margin for view_question */
+</style>
+{% endblock %}

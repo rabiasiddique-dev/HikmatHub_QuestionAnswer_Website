@@ -1,0 +1,131 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }} - Hikmat Hub{% endblock %}
+
+{% block content %}
+<div class="form-container auth-form">
+    <h2>Welcome Back to Hikmat Hub</h2>
+    <p>Login to continue your journey of knowledge.</p>
+    <form method="POST" action="{{ url_for('login') }}">
+        {{ form.hidden_tag() }} <!-- CSRF token -->
+
+        <div class="form-group">
+            {{ form.email.label(class="form-label") }}
+            {{ form.email(class="form-control", placeholder="Your Email Address") }}
+            {% if form.email.errors %}
+                {% for error in form.email.errors %}<span class="form-error">{{ error }}</span>{% endfor %}
+            {% endif %}
+        </div>
+
+        <div class="form-group">
+            {{ form.password.label(class="form-label") }}
+            {{ form.password(class="form-control", placeholder="Your Password") }}
+            {% if form.password.errors %}
+                {% for error in form.password.errors %}<span class="form-error">{{ error }}</span>{% endfor %}
+            {% endif %}
+        </div>
+
+        <div class="form-group form-check-group">
+            <div class="form-check">
+                {{ form.remember(class="form-check-input", id="rememberMe") }}
+                {{ form.remember.label(class="form-check-label", for="rememberMe") }}
+            </div>
+            {# NAYA: Forgot Password Link #}
+            <a href="{{ url_for('request_password_reset') }}" class="forgot-password small">Forgot password?</a>
+        </div>
+
+        <div class="form-group">
+            {{ form.submit(class="btn btn-primary btn-block") }}
+        </div>
+    </form>
+
+    {# NAYA: Social Login Section #}
+    <div class="social-login-divider my-3">
+        <span class="divider-text">OR</span>
+    </div>
+
+    <div class="social-login-buttons">
+        <a href="{{ url_for('google.login') }}" class="btn btn-google btn-block">
+            <i class="fab fa-google mr-2"></i> Sign in with Google
+        </a>
+        {# Add other social login buttons here if implemented #}
+        {# e.g., <a href="#" class="btn btn-facebook btn-block mt-2"><i class="fab fa-facebook-f mr-2"></i> Sign in with Facebook</a> #}
+    </div>
+    {# --- END Social Login Section --- #}
+
+
+    <div class="auth-switch mt-4"> {# Added mt-4 for spacing #}
+        <p>Don't have an account? <a href="{{ url_for('register') }}">Create one now</a></p>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<style>
+/* Styles for login page enhancements */
+.form-check-group {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.9rem; /* Ensure consistent size */
+    margin-bottom: 1.25rem; /* Standard margin */
+}
+.form-check {
+    display: flex;
+    align-items: center;
+}
+.form-check-input {
+    margin-right: 0.5rem;
+    margin-top: 0; /* Adjust vertical alignment if needed */
+}
+.forgot-password.small {
+    font-size: 0.85em; /* Make it slightly smaller */
+}
+.social-login-divider {
+    text-align: center;
+    position: relative;
+    margin: 1.5rem 0; /* my-3 equivalent */
+}
+.social-login-divider::before,
+.social-login-divider::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    width: calc(50% - 25px); /* Adjust width based on text */
+    height: 1px;
+    background-color: var(--border-color);
+}
+.social-login-divider::before { left: 0; }
+.social-login-divider::after { right: 0; }
+.divider-text {
+    background-color: var(--card-bg); /* Match form container background */
+    padding: 0 0.75rem;
+    color: var(--text-color-light);
+    font-size: 0.9em;
+    font-weight: 500;
+}
+.social-login-buttons .btn {
+    font-size: 0.95rem;
+    padding-top: 0.7rem;
+    padding-bottom: 0.7rem;
+}
+.btn-google {
+    background-color: #DB4437; /* Google Red */
+    color: white;
+    border-color: #DB4437;
+}
+.btn-google:hover {
+    background-color: #C33D2E;
+    border-color: #C33D2E;
+    color: white;
+}
+.btn-google .fa-google {
+    font-size: 1.1em; /* Make icon slightly larger */
+}
+/* .mt-2 { margin-top: 0.5rem !important; } */
+.mt-3 { margin-top: 1rem !important; }
+.mt-4 { margin-top: 1.5rem !important; }
+.mr-2 { margin-right: 0.5rem !important; }
+</style>
+{% endblock %}

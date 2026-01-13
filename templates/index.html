@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block content %}
+<header class="hero-section">
+    <h1>Welcome to Hikmat Hub</h1>
+    <p>Discover insights, share your knowledge, and connect with curious minds.</p>
+    <a href="{{ url_for('ask_question') }}" class="btn btn-primary btn-lg">Ask Your First Question</a>
+</header>
+
+<section class="questions-list">
+    <h2>Latest Questions</h2>
+    {% if questions %}
+        {% for question in questions %}
+            {% include 'partials/_question_card.html' %}
+        {% endfor %}
+    {% else %}
+        <p class="empty-state">No questions yet. Be the first to ask!</p>
+    {% endif %}
+</section>
+{% endblock %}
