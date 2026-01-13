@@ -4,39 +4,22 @@ import re
 from collections import Counter
 import os
 
-# NLTK imports - keeping these for good tokenization
+# NLTK imports
 import nltk
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
 
 def ensure_nltk():
-    """Ensure NLTK data is downloaded (Lazy Init)"""
-    # Configure NLTK to use /tmp directory for Vercel
-    nltk_data_path = os.path.join('/tmp', 'nltk_data')
-    if not os.path.exists(nltk_data_path):
-        os.makedirs(nltk_data_path, exist_ok=True)
-
-    if nltk_data_path not in nltk.data.path:
-        nltk.data.path.append(nltk_data_path)
-
-    try:
-        nltk.data.find('tokenizers/punkt')
-    except LookupError:
-        try:
-            nltk.download('punkt', download_dir=nltk_data_path)
-        except: pass # Fallback or already downloading
-        
-    try:
-        nltk.data.find('corpora/stopwords')
-    except LookupError:
-        try:
-            nltk.download('stopwords', download_dir=nltk_data_path)
-        except: pass
+    """Ensure NLTK data path is set to local bundled directory"""
+    # Look for 'nltk_data' in the current application directory
+    local_nltk_path = os.path.join(os.getcwd(), 'nltk_data')
+    if os.path.exists(local_nltk_path) and local_nltk_path not in nltk.data.path:
+        nltk.data.path.insert(0, local_nltk_path)
 
 
 def preprocess_text(text):
-    """Clean and preprocess text for NLP"""
-    ensure_nltk() # Call init here
+    """Clean and preprocess text with fallback if NLTK data missing"""
+    ensure_nltk()
     try:
         text = text.lower()
         text = re.sub(r'[^a-zA-Z\s]', '', text)
@@ -45,8 +28,12 @@ def preprocess_text(text):
         tokens = [word for word in tokens if word not in stop_words and len(word) > 2]
         return tokens
     except Exception as e:
-        # Fallback if NLTK fails completely (e.g. download failed)
-        return text.lower().split()
+        # Robust Fallback: Simple split if NLTK fails
+        # This prevents 500 errors on Vercel if data is missing
+        text = text.lower()
+        text = re.sub(r'[^a-zA-Z\s]', '', text)
+        return [t for t in text.split() if len(t) > 2]
+
 
 # --- Simple TF-IDF Implementation (Pure Python) ---
 
